@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 @Service
@@ -29,9 +31,17 @@ public class MemberServiceImpl implements MemberService {
         return null;
     }
 
+    /**
+     * 登入會員
+     */
     @Override
     public Member login(String memMail, String memPwd) {
-        return null;
+        Member getMemMail = memberRepository.findByMemMail(memMail);
+        if (getMemMail == null) return getMemMail;
+
+        // 核對密碼
+        getMemMail = (hashPassword(memPwd).equals(getMemMail.getMemPwd())) ? getMemMail : null;
+        return getMemMail;
     }
 
     @Override
@@ -39,14 +49,85 @@ public class MemberServiceImpl implements MemberService {
         return null;
     }
 
-    /**
-     * 查找所有會員並返回一個 MemberVO 的列表。
-     *
-     * @return 包含所有會員的 List<MemberVO> 列表。
-     */
     @Override
     public List<Member> findAll() {
         return memberRepository.findAll();
+    }
+
+    /**
+     * 哈希(MD5)密碼加密
+     */
+    @Override
+    public String hashPassword(String memPwd) {
+
+        // 將 memPwd 加上前綴 "Fall" 和後綴 "Love" 進行簡易密碼加密
+        memPwd = "Fall" + memPwd + "Love";
+
+        // 根據 MD5 演算法生成 MessageDigest 物件
+        MessageDigest md5 = null;
+        try {
+            md5 = MessageDigest.getInstance("MD5");
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+            return "";
+        }
+
+        // 將字符串 memPwd 轉換為字節陣列
+        byte[] srcBytes = memPwd.getBytes();
+        // 使用 srcBytes 更新摘要
+        md5.update(srcBytes);
+        // 完成哈希演算法計算，得到 result
+        byte[] resultBytes = md5.digest();
+
+        return new String(resultBytes);
+    }
+
+    /**
+     * 處理忘記密碼的功能
+     */
+    @Override
+    public boolean forgetPassword(String memMail) {
+
+        if (memberRepository.existsByMemMail(memMail)) {
+            String authCode = getAuthCode();
+        }
+        return false;
+    }
+
+    /**
+     * 產生一個隨機的密碼。
+     *
+     * 此方法會產生一個長度為 8 的隨機密碼。
+     * 密碼可能包含大小寫英文字母、小寫英文字母和數字。
+     *
+     * @return 長度為 8 的隨機密碼。
+     */
+    private String getAuthCode() {
+        // A~Z unicode 65~90
+        // a~z unicode 97~122
+        String random = "";
+        for (int i = 1; i <= 8; i++) {
+            int getChose = (int)(Math.random() * 3);
+            switch (getChose) {
+                case 0:
+                    int getNumber = getRandom(0, 9);
+                    random += String.valueOf(getNumber);
+                    break;
+                case 1:
+                    char getEnUp = (char) getRandom(65, 90);
+                    random += String.valueOf(getEnUp);
+                    break;
+                case 2:
+                    char getEnDown = (char) getRandom(97, 122);
+                    random += String.valueOf(getEnDown);
+                    break;
+            }
+        }
+        return random;
+    }
+
+    private int getRandom(int min, int max) {
+        return (int)(Math.random() * (max - min + 1) + min);
     }
 
 

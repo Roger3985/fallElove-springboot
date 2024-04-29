@@ -24,18 +24,13 @@ public class MemberControllerBackEnd {
     private StringRedisTemplate redisTemplate;
 
     /**
-     * 處理添加新會員的 Post 請求
+     * 顯示所有會員列表的頁面。
+     * 此方法處理 HTTP GET 請求到 '/backend/member/memberlist' URL 路徑，
+     * 返回呈現所有會員列表的視圖名稱。
      *
-     * @param model 包含模型資料的 'ModelMap' 物件，用於在視圖和控制之間傳遞資料。
-     * @return 返回一個視圖名稱，指定要呈現的前端頁面，這裡是 "frontend/member/addMem"。
+     * @param modelMap 包含模型屬性的 'ModelMap'。
+     * @return 要呈現的視圖名稱 "listAllMember.html"。
      */
-    @PostMapping("/addMem")
-    public String addDate(ModelMap model) {
-        Member member = new Member();
-        model.addAttribute("member", member);
-        return "frontend/member/addMem";
-    }
-
     @GetMapping("/memberlist")
     public String showList(ModelMap modelMap) {
         return "backend/member/listAllMember";

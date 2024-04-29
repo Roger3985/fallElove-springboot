@@ -16,16 +16,7 @@ public class NoticeControllerBackEnd {
     @Autowired
     public NoticeServiceImpl noticeService;
 
-    /**
-     * 顯示所有通知的列表視圖頁面。
-     *
-     * @param modelMap 視圖模型，用於在頁面中存儲和傳遞數據。
-     * @return 返回 "backend/notice/listAllNotice" 視圖名稱，用於渲染通知列表頁面。
-     */
-    @GetMapping("/noticelist")
-    public String showlist(ModelMap modelMap) {
-        return "backend/notice/listAllNotice";
-    }
+
 
 
 

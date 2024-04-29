@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
 
-    <link rel="stylesheet" th:href="@{css/frontend/member/register.css}" />
+    <link rel="stylesheet" th:href="@{/css/frontend/member/register.css}" />
     <style type="text/css">
         b {
             color: red;
@@ -47,6 +47,36 @@
         .platform-button img {
             width: 50px; /* 設定圖片寬度 */
             height: 50px; /* 設定圖片高度 */
+        }
+
+        .input-box2 {
+            display: flex; /* 使用 flex 布局 */
+            flex-direction: column; /* 垂直方向 */
+            align-items: center; /* 水平居中對齊 */
+        }
+
+        /* 定制下拉菜單的樣式 */
+        .email-provider-select {
+            background-color: #f3f3f3; /* 背景顏色 */
+            border: 1px solid #ccc; /* 邊框顏色和樣式 */
+            border-radius: 5px; /* 圓角 */
+            padding: 5px; /* 內邊距 */
+            margin: 5px 0; /* 外邊距 */
+            color: #333; /* 字體顏色 */
+            font-family: Arial, sans-serif; /* 字體 */
+            font-size: 14px; /* 字體大小 */
+        }
+
+        /* 滑鼠懸停在下拉菜單上時的樣式 */
+        .email-provider-select:hover {
+            border-color: #999; /* 滑鼠懸停時的邊框顏色 */
+        }
+
+        /* 下拉菜單中的選項樣式 */
+        .email-provider-select option {
+            padding: 5px;
+            background-color: #fff; /* 選項背景顏色 */
+            color: #333; /* 選項字體顏色 */
         }
     </style>
 
@@ -134,30 +164,31 @@
         <div class="input-box">
             <label>生日:<b>*</b></label>
             <input type="date" placeholder="請輸入生日" th:field="*{memBd}" />
-            <span th:if="${#fields.hasAnyErrors('memBd')}" th:errors="*{memBd}" class="error"></span>
+            <span th:if="${#fields.hasErrors('memBd')}" th:errors="*{memBd}" class="error"></span>
         </div>
 
         <div class="input-box">
             <label>信用卡號:<b>*</b></label>
             <input type="text" placeholder="請輸入信用卡卡號" th:field="*{memCard}" />
-            <span th:if="${#fields.hasAnyErrors('memCard')}" th:errors="*{memCard}" class="error"></span>
+            <span th:if="${#fields.hasErrors('memCard')}" th:errors="*{memCard}" class="error"></span>
         </div>
 
-        <div class="input-box">
+        <br>
+        <div class="input-box2">
             <label>選擇要註冊的第三方平台：<b>*</b></label>
             <div id="platform-buttons">
-                <button type="button" data-value="github" class="platform-button">
-                    <img src="/static/images/frontend/github.png" alt="GitHub" width="50" height="50" />
-                </button>
-                <button type="button" data-value="facebook" class="platform-button">
-                    <img src="/static/images/frontend/facebook.png" alt="Facebook" width="50" height="50" />
-                </button>
-                <button type="button" data-value="google" class="platform-button">
-                    <img src="/static/images/frontend/google.png" alt="Google" width="50" height="50" />
-                </button>
-                <button type="button" data-value="line" class="platform-button">
-                    <img src="/static/images/frontend/line.png" alt="LINE" width="50" height="50" />
-                </button>
+                <button1 type="button" data-value="github" class="platform-button">
+                    <img src="/images/frontend/github.png" alt="GitHub" width="50" height="50" />
+                </button1>
+                <button1 type="button" data-value="facebook" class="platform-button">
+                    <img src="/images/frontend/facebook.png" alt="Facebook" width="50" height="50" />
+                </button1>
+                <button1 type="button" data-value="google" class="platform-button">
+                    <img src="/images/frontend/google.png" alt="Google" width="50" height="50" />
+                </button1>
+                <button1 type="button" data-value="line" class="platform-button">
+                    <img src="/images/frontend/line.png" alt="LINE" width="50" height="50" />
+                </button1>
             </div>
             <input type="hidden" th:field="*{provider}" id="provider-hidden" />
             <span th:if="${#fields.hasErrors('provider')}" th:errors="*{provider}" class="error"></span>
@@ -169,6 +200,7 @@
     <a th:href="@{login}"><button class="goBack">返回登入</button></a>
 </section>
 <script>
+
     // 監聽平台按鈕的點擊事件
     document.querySelectorAll('.platform-button').forEach(button => {
         button.addEventListener('click', function() {
@@ -179,7 +211,10 @@
         });
     });
 </script>
-<script th:src="@{/js/FrontEnd/mem/register.js}"></script>
-<script th:src="@{/js/BackStage/rentapp/addRentApp.js}"></script>
+<script th:src="@{/js/frontend/member/register.js}"></script>
+<script th:src="@{/js/backend/rentapp/addRentApp.js}"></script>
+
+</script>
+
 </body>
 </html>
