@@ -67,19 +67,30 @@ public class MemberServiceImpl implements MemberService {
         MessageDigest md5 = null;
         try {
             md5 = MessageDigest.getInstance("MD5");
+            // 將字符串 memPwd 轉換為字節陣列
+            byte[] srcBytes = memPwd.getBytes();
+            // 使用 srcBytes 更新摘要
+            md5.update(srcBytes);
+            // 完成哈希演算法計算，得到 result
+            byte[] resultBytes = md5.digest();
+
+            // 將字節陣列轉換為十六進制字符串
+            StringBuilder hexString = new StringBuilder();
+            for (byte b : resultBytes) {
+                String hex = Integer.toHexString(0xff & b);
+                if (hex.length() == 1) {
+                    hexString.append('0');
+                }
+                hexString.append(hex);
+            }
+
+            // 返回十六進制字符串
+            return hexString.toString();
+
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
             return "";
         }
-
-        // 將字符串 memPwd 轉換為字節陣列
-        byte[] srcBytes = memPwd.getBytes();
-        // 使用 srcBytes 更新摘要
-        md5.update(srcBytes);
-        // 完成哈希演算法計算，得到 result
-        byte[] resultBytes = md5.digest();
-
-        return new String(resultBytes);
     }
 
     /**

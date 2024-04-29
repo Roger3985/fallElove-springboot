@@ -35,6 +35,9 @@ public class Administrator {
     private Date admHireDate;
     @Column(name = "admphoto", columnDefinition = "blob")
     private byte[] admPhoto;
+    @Column(name = "admsalt")
+    private String admSalt;
+
     @JsonBackReference
     @OneToMany(mappedBy = "administrator", cascade = CascadeType.ALL)
     private Set<StudioOrder> studioOrders;
@@ -49,9 +52,10 @@ public class Administrator {
     private Set<ColumnArticle> columnArticles;
 
     public Administrator() {
+
     }
 
-    public Administrator(Integer admNo, String admPwd, String admName, Byte admStat, String admEmail, Title title, Date admHireDate, byte[] admPhoto, Set<StudioOrder> studioOrders, Set<Report> reports, Set<ServiceRecord> serviceRecords, Set<ColumnArticle> columnArticles) {
+    public Administrator(Integer admNo, String admPwd, String admName, Byte admStat, String admEmail, Title title, Date admHireDate, byte[] admPhoto, String admSalt, Set<StudioOrder> studioOrders, Set<Report> reports, Set<ServiceRecord> serviceRecords, Set<ColumnArticle> columnArticles) {
         this.admNo = admNo;
         this.admPwd = admPwd;
         this.admName = admName;
@@ -60,6 +64,7 @@ public class Administrator {
         this.title = title;
         this.admHireDate = admHireDate;
         this.admPhoto = admPhoto;
+        this.admSalt = admSalt;
         this.studioOrders = studioOrders;
         this.reports = reports;
         this.serviceRecords = serviceRecords;
@@ -128,6 +133,14 @@ public class Administrator {
 
     public void setAdmPhoto(byte[] admPhoto) {
         this.admPhoto = admPhoto;
+    }
+
+    public String getAdmSalt() {
+        return admSalt;
+    }
+
+    public void setAdmSalt(String admSalt) {
+        this.admSalt = admSalt;
     }
 
     public Set<StudioOrder> getStudioOrders() {
