@@ -1,5 +1,6 @@
 package com.roger.notice.service;
 
+import com.roger.member.entity.Member;
 import com.roger.notice.entity.Notice;
 
 import java.util.List;
@@ -13,4 +14,6 @@ public interface NoticeService {
      *         如果沒有符合條件的記錄，則返回空列表。
      */
     List<Notice> getAll();
+
+    public Notice getOneByMember(Member member);
 }

@@ -17,9 +17,7 @@ public interface MemberRepository extends JpaRepository<Member, Integer> {
      * @return 如果找到相應的會員，則返回該會員。
      */
     @Transactional
-    public Member findByMemMail(String memMail);
-
-    /**
+    public Member findByMemMail(String memMail);    /**
      * 判斷指定的電子郵件是否存在於會員資料庫中。
      *
      * 此方法使用 JpaRepository 的 'existsByMemMail'

@@ -1,5 +1,6 @@
 package com.roger.notice.service.impl;
 
+import com.roger.member.entity.Member;
 import com.roger.notice.dao.NoticeRepository;
 import com.roger.notice.entity.Notice;
 import com.roger.notice.service.NoticeService;
@@ -27,5 +28,11 @@ public class NoticeServiceImpl implements NoticeService {
     public List<Notice> getAll() {
         return noticeRepository.findAll();
     }
+
+    @Override
+    public Notice getOneByMember(Member member) {
+        return noticeRepository.getOneByMember(member);
+    }
+
 
 }

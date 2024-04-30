@@ -5,11 +5,24 @@ import com.roger.member.entity.Member;
 import com.roger.member.service.MemberService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.sql.Timestamp;
 import java.util.List;
+import java.util.Properties;
+import java.util.concurrent.TimeUnit;
+
+import javax.mail.Authenticator;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 
 @Service
 public class MemberServiceImpl implements MemberService {
@@ -26,9 +39,26 @@ public class MemberServiceImpl implements MemberService {
     @Autowired
     private StringRedisTemplate redisTemplate;
 
+    /**
+     * 註冊新會員
+     */
     @Override
     public Member register(Member member) {
-        return null;
+        // 將會員的密碼進行加密
+        String encryptedPassword = hashPassword(member.getMemPwd());
+        member.setMemPwd(encryptedPassword);
+
+        // 設定會員加入時間
+        member.setMemberJoinTime(new Timestamp(System.currentTimeMillis()));
+
+        // 0為信箱未驗證
+        member.setMemStat((byte) 0);
+
+        // 保存新會員資料到資料庫中
+        Member newData = memberRepository.save(member);
+
+        // 返回新的會員資料
+        return newData;
     }
 
     /**
@@ -36,13 +66,29 @@ public class MemberServiceImpl implements MemberService {
      */
     @Override
     public Member login(String memMail, String memPwd) {
+        // 根據會員的電子郵件尋找會員資料
         Member getMemMail = memberRepository.findByMemMail(memMail);
-        if (getMemMail == null) return getMemMail;
 
-        // 核對密碼
+        // 如果找不到會員資料，則返回該會員資料，即 null
+        if (getMemMail == null) {
+            return getMemMail;
+        }
+
+        // 核對密碼(比較輸入的密碼經哈希後的結果與會員資料中的密碼是否匹配)
         getMemMail = (hashPassword(memPwd).equals(getMemMail.getMemPwd())) ? getMemMail : null;
+
+        // 返回會員資料(如果密碼匹配則返回會員資料；否則返回null)
         return getMemMail;
     }
+
+    /**
+     * 編輯會員資料
+     */
+    @Override
+    public Member edit(Member newData) {
+        return memberRepository.save(newData);
+    }
+
 
     @Override
     public Member findByNo(Integer memNo) {
@@ -55,7 +101,68 @@ public class MemberServiceImpl implements MemberService {
     }
 
     /**
+     * 信箱驗證
+     */
+    @Override
+    public boolean verifyMail(String mail, String subject, String text, String verifyID) {
+        verifyID = (verifyID == null) ? getAuthCode() : verifyID;
+
+        try {
+            // 設定使用 SSL 連線至 Gmail smtp Server
+            Properties props = new Properties();
+            props.put("mail.smtp.host", "smtp.gmail.com");
+            props.put("mail.smtp.socketFactory.port", "465");
+            props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+            props.put("mail.smtp.auth", "true");
+            props.put("mail.smtp.port", "465");
+
+            // 設定 Gmail 帳號跟密碼
+            final String myGmail = "ixlogic.wu@gmail.com";
+            final String myGmail_password = "ddjomltcnypgcstn";
+
+            Session session = Session.getInstance(props, new Authenticator() {
+                protected PasswordAuthentication getPasswordAuthentication() {
+                    // 返回 Gmail 帳號和密碼進行身分驗證
+                    return new PasswordAuthentication(myGmail, myGmail_password);
+                }
+            });
+
+            // 創建新郵件
+            Message message = new MimeMessage(session);
+            message.setFrom(new InternetAddress(myGmail));
+
+            // 設定郵件的收件人
+            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(mail));
+
+            // 設定郵件的主旨
+            message.setSubject(subject);
+
+            // 設定郵件的內容，包括驗證ID
+            message.setText(text + verifyID);
+
+            // 發送郵件
+            Transport.send(message);
+            System.out.println("傳送成功");
+
+            // 將驗證 ID 設置到 Redis 中，並設置過期時間為20秒
+            ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
+            valueOperations.set("templateID" + mail, verifyID);
+            redisTemplate.expire("templateID" + mail, 20, TimeUnit.SECONDS);
+            System.out.println("yes");
+
+            // 郵件發送成功，返回true
+            return true;
+        } catch (MessagingException e) {
+            System.out.println("傳送失敗!");
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+
+    /**
      * 哈希(MD5)密碼加密
+     * 參考網站https://jax-work-archive.blogspot.com/2015/02/java.html
      */
     @Override
     public String hashPassword(String memPwd) {
@@ -101,7 +208,12 @@ public class MemberServiceImpl implements MemberService {
 
         if (memberRepository.existsByMemMail(memMail)) {
             String authCode = getAuthCode();
+            Member member = memberRepository.findByMemMail(memMail);
+            member.setMemPwd(hashPassword(authCode));
+            edit(member);
+            return verifyMail(memMail, "Fall衣Love發送新密碼", "你的新密碼為:", authCode);
         }
+        // 發送隨機密碼簡訊
         return false;
     }
 

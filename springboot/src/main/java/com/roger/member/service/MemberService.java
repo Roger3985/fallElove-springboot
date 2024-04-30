@@ -23,6 +23,16 @@ public interface MemberService {
     public Member login(String memMail, String memPwd);
 
     /**
+     * 編輯會員資料
+     * 此方法接收一個 'Member' 類型的物件，表示需要更新的會員資料。
+     * 方法執行後，將會根據提供的會員資料更新相應的會員訊息。
+     *
+     * @param newData 要編輯的會員物件，包含了需要更新的會員訊息。
+     * @return 更新後的會員物件。
+     */
+    public Member edit(Member newData);
+
+    /**
      * 根據會員編號查詢會員資料
      *
      * @param memNo 要查詢的會員編號
@@ -36,6 +46,19 @@ public interface MemberService {
      * @return 包含所有會員的 List<Member> 列表。
      */
     public List<Member> findAll();
+
+    /**
+     * 信箱驗證。
+     * 此方法負責發送信箱驗證的郵件。
+     * 方法接受驗證碼、主題、內容和驗證ID作為參數，並使用這些信息向用戶發送驗證郵件。
+     *
+     * @param mail 驗證碼，用於郵件中進行身份驗證。
+     * @param subject 郵件主題，描述郵件中的內容。
+     * @param text 郵件內容，包含驗證相關信息。
+     * @param verifyID 驗證ID，用於識別驗證操作。
+     * @return 郵件發送結果，通常為狀態描述或識別驗證狀態的字符串。
+     */
+    public boolean verifyMail(String mail, String subject, String text, String verifyID);
 
     /**
      * 使用哈希演算法對密碼進行加密。
@@ -57,8 +80,6 @@ public interface MemberService {
      * @return 如果重置密碼的請求成功，則返回 true;否則返回 false
      */
     public boolean forgetPassword(String memMail);
-
-
 
 
 }

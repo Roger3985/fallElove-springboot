@@ -6,7 +6,7 @@
 	content="width=device-width, initial-scale=1, shrink-to-fit=no" />
 <meta name="description" content="" />
 <meta name="author" content="" />
-<title>租你好運</title>
+<title>Fall衣Love</title>
 <!-- Favicon-->
 <!-- <link rel="icon" type="image/x-icon" href="assets/favicon.ico" /> -->
 <!-- Bootstrap Icons-->
@@ -25,9 +25,9 @@
 	href="https://cdnjs.cloudflare.com/ajax/libs/SimpleLightbox/2.1.0/simpleLightbox.min.css"
 	rel="stylesheet" />
 <!-- Core theme CSS (includes Bootstrap)-->
-<link th:href="@{/css/FrontEnd/indexCSS/styles.css}" rel="stylesheet" />
+<link th:href="@{/css/frontend/index/styles.css}" rel="stylesheet" />
 
-<link th:href="@{/css/FrontEnd/indexCSS/style2.css}" rel="stylesheet" />
+<link th:href="@{/css/frontend/index/style2.css}" rel="stylesheet" />
 
 <style>
 /* 表格樣式 */
@@ -83,7 +83,7 @@
 <div id="filter"></div>
 <body id="page-top">
 	<!-- Navigation-->
-	<div th:replace="FrontEnd/HTMLTool/nav :: nav" ></div>
+<!--	<div th:replace="FrontEnd/HTMLTool/nav :: nav" ></div>-->
 
 
 	<!------------------------------------------------------------------------------------>
@@ -175,6 +175,9 @@
 										</div>
 									</a>
 								</div>
+								<div class="form-link">
+									<a th:href="@{memberData}" class="link signup-link">會員個人資訊</a>
+								</div>
 							</div>
 						</div>
 					</div>
@@ -259,7 +262,7 @@
 	<footer class="bg-light py-5">
 		<div class="container px-4 px-lg-5">
 			<div class="small text-center text-muted">Copyright &copy; 2024
-				- CHA104G2-GOOD_LUCK</div>
+				- CIA101G2-Fall衣Love</div>
 		</div>
 	</footer>
 	<!-- Bootstrap core JS-->
