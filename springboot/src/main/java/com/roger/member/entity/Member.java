@@ -66,6 +66,8 @@ public class Member implements java.io.Serializable {
     private Byte memStat;
     @Column(name = "memsalt")
     private String memSalt;
+    @Column(name = "mempic", columnDefinition = "blob")
+    private byte[] memPic;
 
     @JsonBackReference
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
@@ -113,7 +115,11 @@ public class Member implements java.io.Serializable {
     public Member() {
     }
 
-    public Member(Integer memNo, String mName, String memAcc, String memPwd, String memMob, Byte mGender, String memMail, String memAdd, Date memBd, String memCard, Byte provider, String clientID, String displayName, String accessToken, String refreshToken, Timestamp tknExpireTime, Timestamp creationTime, Timestamp memberJoinTime, Byte memStat, String memSalt, Set<Notice> notices, Set<MyCoupon> myCoupons, Set<ProductOrder> productOrders, Set<ProductMyFavorite> productMyFavorites, Set<Cart> carts, Set<ClickLike> clickLikes, Set<ArticleCollection> articleCollections, Set<Report> reports, Set<ColumnReply> columnReplies, Set<RentalOrder> rentalOrders, Set<RentalMyTrack> rentalMyTracks, Set<RentalMyFavorite> rentalMyFavorites, Set<StudioOrder> studioOrders, Set<ServiceRecord> serviceRecords) {
+    public Member(Integer memNo) {
+        this.memNo = memNo;
+    }
+
+    public Member(Integer memNo, String mName, String memAcc, String memPwd, String memMob, Byte mGender, String memMail, String memAdd, Date memBd, String memCard, Byte provider, String clientID, String displayName, String accessToken, String refreshToken, Timestamp tknExpireTime, Timestamp creationTime, Timestamp memberJoinTime, Byte memStat, String memSalt, byte[] memPic) {
         this.memNo = memNo;
         this.mName = mName;
         this.memAcc = memAcc;
@@ -134,20 +140,7 @@ public class Member implements java.io.Serializable {
         this.memberJoinTime = memberJoinTime;
         this.memStat = memStat;
         this.memSalt = memSalt;
-        this.notices = notices;
-        this.myCoupons = myCoupons;
-        this.productOrders = productOrders;
-        this.productMyFavorites = productMyFavorites;
-        this.carts = carts;
-        this.clickLikes = clickLikes;
-        this.articleCollections = articleCollections;
-        this.reports = reports;
-        this.columnReplies = columnReplies;
-        this.rentalOrders = rentalOrders;
-        this.rentalMyTracks = rentalMyTracks;
-        this.rentalMyFavorites = rentalMyFavorites;
-        this.studioOrders = studioOrders;
-        this.serviceRecords = serviceRecords;
+        this.memPic = memPic;
     }
 
     public Integer getMemNo() {
@@ -308,6 +301,14 @@ public class Member implements java.io.Serializable {
 
     public void setMemSalt(String memSalt) {
         this.memSalt = memSalt;
+    }
+
+    public byte[] getMemPic() {
+        return memPic;
+    }
+
+    public void setMemPic(byte[] memPic) {
+        this.memPic = memPic;
     }
 
     public Set<Notice> getNotices() {

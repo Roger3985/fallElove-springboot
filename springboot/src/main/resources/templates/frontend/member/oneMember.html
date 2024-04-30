@@ -145,13 +145,14 @@
                 <td th:text="${myData.memAcc}"></td>
             </tr>
             <tr>
+            <tr>
                 <td>會員密碼</td>
                 <td th:text="${myData.memPwd}"></td>
             </tr>
             <tr>
                 <td>密碼變更</td>
                 <td>
-                    <form th:action="@{}" method="get">
+                    <form th:action="@{newPassword}" method="get">
                         <input type="submit" value="變更密碼" class="submit">
                     </form>
                 </td>
@@ -197,8 +198,8 @@
                 <!-- 				<td ><img th:src="@{/mem/picture} + '?memno=' + ${myData.memNo}" width="100px" height="100px"></td> -->
                 <td>修改會員資料</td>
                 <td >
-                    <form method="get" th:action="@{updateMem}">
-                        <input type="hidden" name= "memNo" th:value="${myData.memNo}">
+                    <form method="get" th:action="@{updateMember}">
+                        <input type="hidden" name= "memNo" th:text="${myData.memNo}" readonly>
                         <input type="submit" value="修改" class="submit">
                     </form>
                 </td>
@@ -215,6 +216,7 @@
 
     </main>
     <script>
+
         let choose_file_el = document.getElementById("choose_file");
         choose_file_el.addEventListener("click", function () {
             let my_input = document.getElementById("the_file");

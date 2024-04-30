@@ -34,15 +34,17 @@
 
             <form method="post" th:action="@{loginPage}">
                 <div>
-                    <span th:text="*{message}" class="error" id="ename.errors"></span>
-                    <span th:text="*{noFun}" class="error" id="ename.errors"></span>
+                    <span th:text="*{message}" class="error" id="message.errors"></span>
+                    <span th:text="*{noFun}" class="error" id="noFun.errors"></span>
                 </div>
                 <div class="field input-field">
                     <input type="email" placeholder="信箱" class="input" name="mail">
                 </div>
 
                 <div class="field input-field">
-                    <input type="password" placeholder="密碼" class="password" name="password">
+                    <label>
+                        <input type="password" placeholder="密碼" class="password" name="password">
+                    </label>
                     <i class='bx bx-hide eye-icon'></i>
                 </div>
 

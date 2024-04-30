@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
 
+    <link th:href="@{/css/backend/member/maxcdn.css}" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/croppie/2.6.5/croppie.css" rel="stylesheet"></link>
+    <link th:href='@{/css/backend/member/bootstrap-3.3.6.css}' rel='stylesheet' />
     <link rel="stylesheet" th:href="@{/css/frontend/member/register.css}" />
     <style type="text/css">
         b {
@@ -79,13 +82,14 @@
             color: #333; /* 選項字體顏色 */
         }
     </style>
-    <title>歡迎加入Fall衣Love</title>
+
+    <title>歡迎加入41L</title>
 </head>
 
 <body>
 <section class="container">
     <header style="font-size: 30px; font-weight: bolder;">註冊會員</header>
-    <form class="form" method="post" th:action="@{addMember}" th:object="${member}" enctype="multipart/form-data">
+    <form class="form" method="post" th:action="@{memadd}" th:object="${member}" enctype="multipart/form-data">
         <div class="input-box">
             <label>姓名：<b>*</b></label>
             <input type="text" placeholder="請輸入姓名" th:field="*{mName}" />
@@ -171,6 +175,28 @@
             <input type="text" placeholder="請輸入信用卡卡號" th:field="*{memCard}" />
             <span th:if="${#fields.hasErrors('memCard')}" th:errors="*{memCard}" class="error"></span>
         </div>
+
+        <label class="btn btn-info">
+            <input id="upload_img" name="uploadImg" style="display:none;" type="file" accept="image/*">
+            <!-- 隱藏的輸入字段，用於儲存裁剪後的圖片數據，施工中 -->
+            <input type="hidden" name="croppedImage" id="croppedImage" value="">
+            <i class="fa fa-photo"></i> 上傳圖片
+        </label>
+
+        <!-- 裁剪按鈕 -->
+        <button id="crop_img" type="button" class="btn btn-info"><i class="fa fa-scissors"></i> 裁剪圖片</button>
+<!--        <div class="input-box2">-->
+<!--            <label>上傳圖片</label>-->
+<!--            <div class="file-input-container">-->
+<!--                <input type="file" id="memPic" th:field="*{memPic}" accept="image/*" onclick="previewImage(event)">-->
+<!--                <button class="upload-button">選擇圖片</button>-->
+<!--                <span th:if="${#fields.hasErrors('memPic')}" th:errors="*{memPic}" class="error"></span>-->
+<!--            </div>-->
+<!--            <div class="image-preview">-->
+<!--                <img id="imagePreview" src="#" alt="圖片預覽" style="display: none;">-->
+<!--            </div>-->
+<!--        </div>-->
+
         <br>
         <div class="input-box2">
             <label>選擇要註冊的第三方平台：<b>*</b></label>
@@ -193,27 +219,146 @@
         </div>
 
 
-        <input type="file" th:field="*{memPic}" style="dispaly: none;">
         <button>註冊</button>
     </form>
     <a th:href="@{login}"><button class="goBack">返回登入</button></a>
 </section>
+
 <script>
+    (function ($) {
+        var width_crop = 300, // 圖片裁切寬度 px 值
+            height_crop = 200, // 圖片裁切高度 px 值
+            type_crop = "square", // 裁切形狀: square 為方形, circle 為圓形
+            width_preview = 350, // 預覽區塊寬度 px 值
+            height_preview = 350, // 預覽區塊高度 px 值
+            compress_ratio = 0.85, // 圖片壓縮比例 0~1
+            type_img = "jpeg", // 圖檔格式 jpeg png webp
+            oldImg = new Image(),
+            myCrop, file, oldImgDataUrl;
+
+        // 裁切初始參數設定
+        myCrop = $("#oldImg").croppie({
+            viewport: { // 裁切區塊
+                width: 300,
+                height: 300,
+                type: "circle" // 改為圓形的裁切區塊,type_crop為方框
+            },
+            boundary: { // 預覽區塊
+                width: width_preview,
+                height: height_preview
+            }
+            // enableResize: true // 允許裁切窗口大小調整，因滑鼠移動控制方式還沒搞定，此段暫時拿掉
+        });
+
+        function readFile(input) {
+            if (input.files && input.files[0]) {
+                file = input.files[0];
+            } else {
+                alert("瀏覽器不支援此功能！建議使用最新版本 Chrome");
+                return;
+            }
+
+            if (file.type.indexOf("image") == 0) {
+                var reader = new FileReader();
+
+                reader.onload = function (e) {
+                    oldImgDataUrl = e.target.result;
+                    oldImg.src = oldImgDataUrl; // 載入 oldImg 取得圖片資訊
+                    myCrop.croppie("bind", {
+                        url: oldImgDataUrl
+                    });
+                };
+
+                reader.readAsDataURL(file);
+            } else {
+                alert("您上傳的不是圖檔！");
+            }
+        }
+
+        function displayCropImg(src) {
+            var html = "<img src='" + src + "' />";
+            $("#newImg").html(html);
+        }
+
+        $("#upload_img").on("change", function () {
+            $("#oldImg").show();
+            readFile(this);
+        });
+
+        oldImg.onload = function () {
+            var width = this.width,
+                height = this.height,
+                fileSize = Math.round(file.size / 1000),
+                html = "";
+
+            html += "<p>原始圖片尺寸 " + width + "x" + height + "</p>";
+            html += "<p>檔案大小約 " + fileSize + "k</p>";
+            $("#oldImg").before(html);
+        };
+
+        function displayNewImgInfo(src) {
+            var html = "",
+                filesize = src.length * 0.75;
+
+            html += "<p>裁切圖片尺寸 " + width_crop + "x" + height_crop + "</p>";
+            html += "<p>檔案大小約 " + Math.round(filesize / 1000) + "k</p>";
+            $("#newImgInfo").html(html);
+        }
+
+        $("#crop_img").on("click", function () {
+            myCrop.croppie("result", {
+                type: "canvas",
+                format: type_img,
+                quality: compress_ratio
+            }).then(function (src) {
+                displayCropImg(src);
+
+                // 將裁剪後的圖片數據設置到隱藏的輸入字段中
+                $("#croppedImage").val(src);
+
+                displayNewImgInfo(src);
+            });
+        });
+
+        // $("#crop_img").on("click", function () {
+        //     myCrop.croppie("result", {
+        //         type: "blob", // ??型?置? blob 而不是 canvas 以得到 Blob 格式的?片?据
+        //         format: type_img, // ?置?像格式，通常是 jpeg、png 或 webp
+        //         quality: compress_ratio // ?置?片?量
+        //     }).then(function (blob) {
+        //         // 在?段代?中，'blob' 是裁切后的?片的 Blob ?象
+        //         displayCropImg(URL.createObjectURL(blob)); // 使用 URL.createObjectURL(blob) ? Blob ?象???可用的 URL
+        //
+        //         // ?裁切后的 Blob ?据?置到?藏的?入字段中
+        //         // ?里? Blob ?据附加到表??据中
+        //         const formData = new FormData();
+        //         formData.append('croppedImage', blob, 'cropped-image.' + type_img);
+        //         document.getElementById('imageForm').append(formData);
+        //
+        //         // ?示裁切后的?片信息
+        //         displayNewImgInfo(blob);
+        //     });
+        // });
+
+    })(jQuery);
 
     // 監聽平台按鈕的點擊事件
     document.querySelectorAll('.platform-button').forEach(button => {
-        button.addEventListener('click', function() {
-            // 取得選定平台的 data-value 屬性值
-            const provider = this.getAttribute('data-value');
-            // 更新隱藏表單字段的值
-            document.getElementById('provider-hidden').value = provider;
+            button.addEventListener('click', function() {
+                // 取得選定平台的 data-value 屬性值
+                const provider = this.getAttribute('data-value');
+                // 更新隱藏表單字段的值
+                document.getElementById('provider-hidden').value = provider;
+            });
         });
-    });
 </script>
 <script th:src="@{/js/frontend/member/register.js}"></script>
 <script th:src="@{/js/backend/rentapp/addRentApp.js}"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/croppie/2.6.5/croppie.min.js"></script>
 
-</script>
+
+
 
 </body>
 </html>

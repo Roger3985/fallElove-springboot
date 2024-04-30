@@ -10,15 +10,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.io.IOException;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/frontend/member")
@@ -47,7 +52,7 @@ public class MemberControllerFrontEnd {
     public String addMemberData(ModelMap modelMap) {
         Member member = new Member();
         modelMap.addAttribute("member", member);
-        return "frontend/member/addMember";
+        return "frontend/member/addMember2";
     }
 
     /**
@@ -78,6 +83,22 @@ public class MemberControllerFrontEnd {
         return "redirect:frontend/member/memberData";
     }
 
+    /**
+     * 登出處理。
+     * 處理登出請求並清除會話中的特定屬性。
+     * 此方法處理 HTTP GET 請求到 '/frontend/member/logoutMember' URL 路徑。
+     *
+     * @param session session HttpSession 物件，用於移除特定屬性 (如: "loginsuccess" 和 "notice" )。
+     * @param modelMap ModelMap 物件，可以用於添加屬性到模型中 (在此方法中並未使用)。
+     * @return 要重定向到的視圖名稱 "/"，表示根路徑，這將導致用戶返回到主頁面。
+     */
+    @GetMapping("logoutMember")
+    public String logoutMember(HttpSession session, ModelMap modelMap) {
+        session.removeAttribute("loginsuccess");
+        session.removeAttribute("notice");
+        System.out.println("登出成功");
+        return "redirect:/";
+    }
 
     /**
      * 前往登入頁面。
@@ -88,6 +109,39 @@ public class MemberControllerFrontEnd {
     @GetMapping("/loginMember")
     public String goToLoginMember() {
         return "frontend/member/loginMember";
+    }
+
+    /**
+     * 前往修改會員頁面。
+     * 此方法處理 HTTP GET 請求到 '/frontend/member/updateMember' URL 路徑。
+     *
+     * @param modelMap 使用 ModelMap 來儲存會員資料以及地址訊息，以供是圖使用。
+     * @param session 使用 HttpSession 來獲取當前會員的會話。
+     * @return 要呈現的視圖名稱 "frontend/member/updateMember"。
+     */
+    @GetMapping("/updateData")
+    public String updateData(ModelMap modelMap, HttpSession session) {
+
+        // 從會話中獲取已登錄的會員資料
+        Member oldData = (Member) session.getAttribute("loginsuccess");
+
+        // 將會員的地址拆分為陣列
+        String[] add = oldData. getMemAdd().split(" ");
+
+        // 如果會員的地址陣列長度為1，則直接將會員的資料添加到 modelMap 中
+        if (add.length == 1) {
+            modelMap.addAttribute("data", oldData);
+            return "frontend/member/updateMember";
+        }
+
+        // 設置會員的地址為第三部分，並將地址的國家和地區添加到 modelMap 中
+        oldData.setMemAdd(add[2]);
+        modelMap.addAttribute("data", oldData);
+        modelMap.addAttribute("country", add[0]);
+        modelMap.addAttribute("district", add[1]);
+
+        // 返回修改會員資料頁面的視圖名稱
+        return "frontend/member/updateMember";
     }
 
     /**
@@ -192,6 +246,55 @@ public class MemberControllerFrontEnd {
     }
 
     /**
+     * 新增會員資料。
+     * 此方法用於處理 HTTP POST 請求以新增會員資料，它將接收來自前端的會員表單資料，包括會員圖片，會員信息和地區信息等，並將其存儲到資料庫中。
+     *
+     * @param part      會員圖片的 MultipartFile 物件。
+     * @param member    要添加的 Member 物件，包含前端表單提交的會員信息。
+     * @param result    用來驗證 Member 物件的 BindingResult。
+     * @param modelMap  用於存儲和傳遞模型資料的 ModelMap。
+     * @param country   會員的國家信息。
+     * @param district  會員的地區信息。
+     * @param session   用於管理用戶的會話的 HttpSession。
+     * @return          如果驗證驗證失敗，則返回前端驗證頁面的重定向 URL；否則，返回驗證電子郵件的重定向 URL。
+     * @throws IOException  IOException 如果無法從 part 讀取數據則拋出。
+     */
+    @PostMapping("/addMember")
+    public String addMember(@RequestParam("memPic") MultipartFile part,
+                            @Validated(Create.class) Member member,
+                            BindingResult result,
+                            ModelMap modelMap,
+                            @RequestParam("country") String country,
+                            @RequestParam("district") String district,
+                            HttpSession session) throws IOException {
+
+        // 設置會員的完整地址
+        String detailAdd = member.getMemAdd();
+        member.setMemAdd(country + " " + district + " " + detailAdd);
+
+        // 如果有會員圖片，將其儲存到 member 物件中
+        member.setMemPic(part.isEmpty() ? null : part.getBytes());
+
+        // 移除 memPic 字段中的錯誤信息
+        result = removeFieldError(member, result, "memPic");
+
+        // 如果驗證結果有誤，則保留原始地址並返回前端驗證頁面
+        if (result.hasErrors()) {
+            member.setMemAdd(detailAdd);
+        }
+
+        // 註冊會員並將會員資料存入會話
+        Member newData = memberService.register(member);
+        session.setAttribute("loginsuccess", newData);
+
+        // 發送驗證郵件
+        memberService.verifyMail(member.getMemMail(), "Fall衣Love感謝你的註冊!", "驗證碼為:", null);
+
+        // 返回驗證電子郵件的重定向 URL
+        return "redirect:/frontend/member/varifyMail";
+    }
+
+    /**
      * 處理前往驗證的請求。
      * 此方法處理 HTTP GET 請求到 '/frontend/member/varifiedMail' URL 路徑，
      * 並返回信箱驗證頁面的視圖路徑。
@@ -199,7 +302,7 @@ public class MemberControllerFrontEnd {
      * @param modelMap 包含模型屬性的 'ModelMap'。
      * @return 信箱驗證頁面的視圖路徑。
      */
-    @GetMapping("varifyMail")
+    @GetMapping("/varifyMail")
     public String varifyMail(ModelMap modelMap) {
         return "frontend/member/varifiedMail";
     }
@@ -255,7 +358,7 @@ public class MemberControllerFrontEnd {
      * @param session 會話物件，用於儲存和訪問會員訊息。
      * @return 重定向到信箱驗證頁面的 URL。
      */
-    @GetMapping("reSendMail")
+    @GetMapping("/reSendMail")
     public String reSendMail(ModelMap modelMap, HttpSession session) {
 
         Member member = (Member) session.getAttribute("loginsuccess");
@@ -263,7 +366,7 @@ public class MemberControllerFrontEnd {
         // 發送簡訊
         memberService.verifyMail(member.getMemMail(), "Fall衣Love感謝你的註冊!", "驗證碼為:", null);
 
-        return "redirect:frontend/member/varifyMail";
+        return "redirect:/frontend/member/varifyMail";
     }
 
     /**
@@ -326,4 +429,31 @@ public class MemberControllerFrontEnd {
         return "redirect:frontend/member/memberCenter";
     }
 
+    /**
+     * 去除指定字段的錯誤信息並返回更新後的 BindingResult。
+     * 此方法會過濾掉 BindingResult 中與指定字段相關的錯誤信息，然後將剩餘的錯誤信息添加到新的 BindingResult 中。
+     *
+     * @param member 要操作的 Member 對象。
+     * @param result 目前的 BindingResult，其中包含 Member 的錯誤信息。
+     * @param removedFieldname 要去除錯誤信息的字段名稱。
+     * @return 更新後的 BindingResult，其中去除了指定字段的錯誤信息。
+     */
+    public BindingResult removeFieldError(Member member, BindingResult result, String removedFieldname) {
+
+        // 過濾掉指定字段的錯誤信息
+        List<FieldError> errorsListToKeep = result.getFieldErrors().stream()
+                .filter(fieldname -> !fieldname.getField().equals(removedFieldname))
+                .collect(Collectors.toList());
+
+        // 創建新的 BindingResult，關聯 Member 物件
+        result = new BeanPropertyBindingResult(member, "member");
+
+        // 將過濾後的錯誤信息添加到新的 BindingResult 中
+        for (FieldError fieldError : errorsListToKeep) {
+            result.addError(fieldError);
+        }
+
+        // 返回修改後的 BindingResult
+        return result;
+    }
 }
