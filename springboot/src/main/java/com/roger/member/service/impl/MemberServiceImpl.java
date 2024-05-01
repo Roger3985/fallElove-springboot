@@ -89,12 +89,25 @@ public class MemberServiceImpl implements MemberService {
         return memberRepository.save(newData);
     }
 
-
+    /**
+     * 變更會員大頭貼
+     */
     @Override
-    public Member findByNo(Integer memNo) {
-        return null;
+    public void changePicture(Member member, byte[] memPic) {
+        memberRepository.updateMemPicById(member.getMemNo(), memPic);
     }
 
+    /**
+     * 會員編號查詢
+     */
+    @Override
+    public Member findByNo(Integer memNo) {
+        return memberRepository.findById(memNo).orElse(null);
+    }
+
+    /**
+     * 查找所有會員
+     */
     @Override
     public List<Member> findAll() {
         return memberRepository.findAll();
@@ -215,6 +228,30 @@ public class MemberServiceImpl implements MemberService {
         }
         // 發送隨機密碼簡訊
         return false;
+    }
+
+    /**
+     * 檢查會員帳號是否在系統中存在。
+     */
+    @Override
+    public boolean existMemAccount(String memAcc) {
+        return memberRepository.existsByMemAcc(memAcc);
+    }
+
+    /**
+     * 檢查會員手機號碼是否在系統中存在。
+     */
+    @Override
+    public boolean existMemMobile(String memMob) {
+        return memberRepository.existsByMemMob(memMob);
+    }
+
+    /**
+     * 檢查會員信箱是否在系統中存在。
+     */
+    @Override
+    public boolean existMemMail(String memMail) {
+        return memberRepository.existsByMemMail(memMail);
     }
 
     /**

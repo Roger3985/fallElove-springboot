@@ -140,7 +140,7 @@
                         <!-- 顯示會員大頭貼 -->
                         <img th:src="@{/frontend/member/picture(memno=${myData.memNo})}" id="memberAvatar" style="width: 100px; height: 100px;" alt="會員大頭貼">
                         <!-- 上傳表單 -->
-                        <form method="post" th:action="@{newPicture}" enctype="multipart/form-data" onsubmit="return handleAvatarUpload(event)">
+                        <form method="post" th:action="@{newPicture2}" enctype="multipart/form-data" onsubmit="return handleAvatarUpload(event)">
                             <input type="file" name="chaPic" id="avatarInput" accept="image/*">
                             <input type="submit" value="上傳新頭貼">
                         </form>
@@ -269,7 +269,7 @@
                         html_newImg.id = "changeImg";
                         html_newImg.style = "width: 100%; height: 100%";
                         let html_oldImg = document.getElementById("memImg");
-                        if (html_oldImg === null) {
+                        if(html_oldImg === null){
                             html_oldImg = document.getElementById("changeImg")
                         }
                         console.log(html_oldImg);
@@ -282,43 +282,37 @@
             });
         });
 
-
-        // 處理表單提交並使用 AJAX 上傳新圖片
+        // 前端 JavaScript 處理表單提交和更新頭像的代碼
         function handleAvatarUpload(event) {
             event.preventDefault(); // 阻止默認提交行為
-
-            // 使用 FormData 收集表單數據
             const formData = new FormData(event.target);
 
-            // 使用 fetch 發送 POST 請求
-            fetch('/frontend/member/newPicture', {
+            fetch('/frontend/member/newPicture2', {
                 method: 'POST',
                 body: formData
             })
-                .then(response => response.json()) // 將回應解析為 JSON 格式
+                .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        // 上傳成功：更新頁面上的大頭貼圖片
                         const avatarElement = document.getElementById('memberAvatar');
-                        avatarElement.src = data.newAvatarUrl; // 更新圖片的 src 屬性
-
-                        // 顯示成功消息
+                        avatarElement.src = data.newAvatarUrl; // 更新頭像的 src 屬性
                         alert('上傳成功！');
-
-                        // 在上傳成功後進行重定向
-                        window.location.href = '/frontend/member/memberData';
                     } else {
-                        // 上傳失敗：顯示錯誤消息
                         console.error('上傳失敗:', data.error);
                         alert('上傳失敗，請重試。');
                     }
                 })
                 .catch(error => {
-                    // 請求過程中的錯誤處理
                     console.error('錯誤:', error);
                     alert('發生錯誤，請稍後重試。');
                 });
         }
+
+        // 綁定表單提交事件處理程序
+        // const form = document.querySelector('form');
+        // if (form) {
+        //     form.addEventListener('submit', handleAvatarUpload);
+        // }
 
     </script>
 </body>

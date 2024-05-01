@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
 
-    <link th:href="@{/css/backend/member/maxcdn.css}" rel="stylesheet" />
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/croppie/2.6.5/croppie.css" rel="stylesheet"></link>
     <link th:href='@{/css/backend/member/bootstrap-3.3.6.css}' rel='stylesheet' />
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" />
+    <link href="@{/css/backend/member/croppie-2.6.5.css}" rel="stylesheet"></link>
     <link rel="stylesheet" th:href="@{/css/frontend/member/register.css}" />
     <style type="text/css">
         b {
@@ -81,6 +81,13 @@
             background-color: #fff; /* 選項背景顏色 */
             color: #333; /* 選項字體顏色 */
         }
+        #oldImg img {
+            max-width: 100% !important;
+        }
+
+        #oldImg {
+            overflow: hidden;
+        }
     </style>
 
     <title>歡迎加入41L</title>
@@ -89,7 +96,7 @@
 <body>
 <section class="container">
     <header style="font-size: 30px; font-weight: bolder;">註冊會員</header>
-    <form class="form" method="post" th:action="@{memadd}" th:object="${member}" enctype="multipart/form-data">
+    <form class="form" method="post" th:action="@{addMember}" th:object="${member}" enctype="multipart/form-data">
         <div class="input-box">
             <label>姓名：<b>*</b></label>
             <input type="text" placeholder="請輸入姓名" th:field="*{mName}" />
@@ -176,12 +183,20 @@
             <span th:if="${#fields.hasErrors('memCard')}" th:errors="*{memCard}" class="error"></span>
         </div>
 
+        <br><br>
+
         <label class="btn btn-info">
             <input id="upload_img" name="uploadImg" style="display:none;" type="file" accept="image/*">
             <!-- 隱藏的輸入字段，用於儲存裁剪後的圖片數據，施工中 -->
-            <input type="hidden" name="croppedImage" id="croppedImage" value="">
+            <input type="hidden" name="croppedImage" id="croppedImage" value="" th:field="*{memPic}">
+            <span th:if="${#fields.hasErrors('memPic')}" th:errors="*{memPic}" class="error"></span>
             <i class="fa fa-photo"></i> 上傳圖片
         </label>
+
+        <div id="oldImg" style="display:none;"></div>
+
+        <div id="newImgInfo" style="display: flex; justify-content: center;"></div>
+        <div id="newImg" style="display: flex; justify-content: center;"></div>
 
         <!-- 裁剪按鈕 -->
         <button id="crop_img" type="button" class="btn btn-info"><i class="fa fa-scissors"></i> 裁剪圖片</button>
@@ -224,12 +239,17 @@
     <a th:href="@{login}"><button class="goBack">返回登入</button></a>
 </section>
 
+<script th:src="@{/js/frontend/member/register.js}"></script>
+<script th:src="@{/js/backend/rentapp/addRentApp.js}"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
+<script th:src="@{/js/backend/member/croppie-2.6.5.js}"></script>
+
 <script>
     (function ($) {
         var width_crop = 300, // 圖片裁切寬度 px 值
             height_crop = 200, // 圖片裁切高度 px 值
             type_crop = "square", // 裁切形狀: square 為方形, circle 為圓形
-            width_preview = 350, // 預覽區塊寬度 px 值
+            width_preview = "100%", // 預覽區塊寬度 px 值
             height_preview = 350, // 預覽區塊高度 px 值
             compress_ratio = 0.85, // 圖片壓縮比例 0~1
             type_img = "jpeg", // 圖檔格式 jpeg png webp
@@ -352,13 +372,6 @@
             });
         });
 </script>
-<script th:src="@{/js/frontend/member/register.js}"></script>
-<script th:src="@{/js/backend/rentapp/addRentApp.js}"></script>
-<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/croppie/2.6.5/croppie.min.js"></script>
-
-
-
 
 </body>
 </html>

@@ -33,6 +33,16 @@ public interface MemberService {
     public Member edit(Member newData);
 
     /**
+     * 變更會員大頭貼。
+     * 此方法接收一個 'Member' 物件和一個 'byte[]' 類型的陣列 'memPic'，用於更改會員的大頭貼圖片。
+     *
+     * @param member 需要更新大頭貼的 `Member` 物件。
+     * @param memPic 新的會員大頭貼圖片，作為一個 `byte[]` 類型的數組。
+     * @throws IllegalArgumentException 如果 `member` 或 `memPic` 為 `null`。
+     */
+    public void changePicture(Member member, byte[] memPic);
+
+    /**
      * 根據會員編號查詢會員資料
      *
      * @param memNo 要查詢的會員編號
@@ -81,5 +91,30 @@ public interface MemberService {
      */
     public boolean forgetPassword(String memMail);
 
+    /**
+     * 檢查會員帳號是否在系統中存在。
+     * 此方法接受會員帳號的標識，並返回該會員帳號是否存在。
+     *
+     * @param memAcc 會員帳號的標識。
+     * @return 如果會員帳號存在，返回 `true`；否則返回 `false`。
+     */
+    public boolean existMemAccount(String memAcc);
 
+    /**
+     * 檢查會員手機號碼是否在系統中存在。
+     * 此方法接受會員手機號碼的標識，並返回該手機號碼是否存在於系統中。
+     *
+     * @param memMob 會員手機號碼的標識。
+     * @return 如果會員手機號碼存在，返回 `true`；否則返回 `false`。
+     */
+    public boolean existMemMobile(String memMob);
+
+    /**
+     * 檢查會員信箱是否在系統中存在。
+     * 此方法接受會員信箱的標識，並返回該信箱是否存在於系統中。
+     *
+     * @param memMail 會員信箱的標識。
+     * @return 如果會員信箱存在，返回 `true`；否則返回 `false`。
+     */
+    public boolean existMemMail(String memMail);
 }

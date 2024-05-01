@@ -66,7 +66,7 @@ public class Member implements java.io.Serializable {
     private Byte memStat;
     @Column(name = "memsalt")
     private String memSalt;
-    @Column(name = "mempic", columnDefinition = "blob")
+    @Column(name = "mempic", columnDefinition = "longblob")
     private byte[] memPic;
 
     @JsonBackReference
