@@ -1,4 +1,4 @@
-package com.roger.member.entity.unique;
+package com.roger.member.entity.uniqueAnnotation;
 
 import javax.validation.groups.Default;
 

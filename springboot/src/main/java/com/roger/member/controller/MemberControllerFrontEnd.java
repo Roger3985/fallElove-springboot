@@ -1,8 +1,7 @@
 package com.roger.member.controller;
 
-import com.ren.administrator.entity.Administrator;
 import com.roger.member.entity.Member;
-import com.roger.member.entity.unique.Create;
+import com.roger.member.entity.uniqueAnnotation.Create;
 import com.roger.member.service.MemberService;
 import com.roger.notice.entity.Notice;
 import com.roger.notice.service.NoticeService;

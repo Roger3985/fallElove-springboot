@@ -12,11 +12,18 @@ import com.iting.productorder.entity.ProductOrder;
 import com.roger.articlecollection.entity.ArticleCollection;
 import com.roger.clicklike.entity.ClickLike;
 import com.roger.columnreply.entity.ColumnReply;
+import com.roger.member.entity.uniqueAnnotation.Create;
+import com.roger.member.entity.uniqueAnnotation.UniqueMemberAccount;
+import com.roger.member.entity.uniqueAnnotation.UniqueMemberMail;
+import com.roger.member.entity.uniqueAnnotation.UniqueMemberMobile;
 import com.roger.notice.entity.Notice;
 import com.roger.report.entity.Report;
 import com.yu.rentalmyfavorite.entity.RentalMyFavorite;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.Set;
@@ -24,48 +31,88 @@ import java.util.Set;
 @Entity // 這個注釋標記 Member 類為一個 JPA 實體（entity）。這意味著這個類將映射到數據庫中的一個表，並表示該類的每個對象（實例）對應於數據庫表中的一行。使用此注釋可以讓 JPA 框架自動管理該類的持久化、查詢、更新和刪除操作。
 @Table(name = "member")
 public class Member implements java.io.Serializable {
+
+    private static final long serialVersionUID = 1L;
+
     @Id // 主鍵
     @GeneratedValue(strategy = GenerationType.IDENTITY) // 設置自動增長鍵
     @Column(name = "memno") // 映射到資料庫中的column的memNo
     private Integer memNo;
+
+    @NotBlank(message = "會員姓名: 請勿空白")
+    @Pattern(regexp = "^[(\u4e00-\u9fa5)(a-zA-Z0-9_)]{2,10}$", message = "會員姓名: 只能是中、英文字母、數字和_")
     @Column(name = "mname")
     private String mName;
-    @Column(name = "memacc", unique = true) //`unique` 屬性設置為 `true`，表示該列應該具有唯一性約束。這意味著數據庫中的每一個 `memAcc` 值都必須是唯一的，不能有重複的值。
+
+    @NotBlank(message = "會員帳號: 請勿空白")
+    @Pattern(regexp = "^[a-zA-Z0-9]{4,10}$", message = "會員帳號: 只能是英文字母、數字")
+    @UniqueMemberAccount(groups = Create.class)
+    @Column(name = "memacc", unique = true) //`uniqueAnnotation` 屬性設置為 `true`，表示該列應該具有唯一性約束。這意味著數據庫中的每一個 `memAcc` 值都必須是唯一的，不能有重複的值。
     private String memAcc;
+
+    @NotBlank(message = "會員密碼: 請勿空白")
     @Column(name = "mempwd")
     private String memPwd;
-    @Column(name = "memmob", unique = true)
+
+    @NotBlank(message = "會員手機: 請勿空白")
+    @Pattern(regexp = "^[0][9]\\d{8}$", message = "手機格式錯誤")
+    @UniqueMemberMobile(groups = Create.class)
+    @Column(name = "memmob", columnDefinition = "CHAR(10)", unique = true)
     private String memMob;
+
+    @NotNull(message = "請輸入性別")
     @Column(name = "mgender")
     private Byte mGender;
+
+    @NotBlank(message = "會員信箱: 請勿空白!")
+    @Pattern(regexp = "^[\\w-_\\.+]*[\\w-_\\.]\\@([\\w]+\\.)+[\\w]+[\\w]$", message = "信箱格式輸入錯誤！")
+    @UniqueMemberMail(groups = Create.class)
     @Column(name = "memmail", unique = true)
     private String memMail;
+
+//    @NotBlank(message = "會員地址: 請勿空白")
     @Column(name = "memadd")
     private String memAdd;
+
+//    @NotBlank(message = "會員生日: 請勿空白")
     @Column(name = "membd")
     private Date memBd;
+
+//    @NotBlank(message = "會員信用卡: 請勿空白")
     @Column(name = "memcard")
     private String memCard;
+
     @Column(name = "provider")
     private Byte provider;
+
     @Column(name = "clientid")
     private String clientID;
+
     @Column(name = "displayname")
     private String displayName;
+
     @Column(name = "accesstoken")
     private String accessToken;
+
     @Column(name = "refreshtoken")
     private String refreshToken;
+
     @Column(name = "tknexpiretime")
     private Timestamp tknExpireTime;
+
     @Column(name = "creationtime")
     private Timestamp creationTime;
+
+    @NotNull(message = "請輸入加入時間")
     @Column(name = "memberjointime")
     private Timestamp memberJoinTime;
+
     @Column(name = "memstat")
     private Byte memStat;
+
     @Column(name = "memsalt")
     private String memSalt;
+
     @Column(name = "mempic", columnDefinition = "longblob")
     private byte[] memPic;
 
