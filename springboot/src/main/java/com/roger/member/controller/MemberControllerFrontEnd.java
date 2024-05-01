@@ -33,15 +33,23 @@ import java.util.stream.Collectors;
 @RequestMapping("/frontend/member")
 public class MemberControllerFrontEnd {
 
+    /**
+     * MemberService 的自動裝配成員變數，用於處理會員相關的服務。
+     */
     @Autowired
     private MemberService memberService;
 
+    /**
+     * NoticeService 的自動裝配成員變數，用於處理通知相關的服務。
+     */
     @Autowired
     private NoticeService noticeService;
 
+    /**
+     * StringRedisTemplate 的自動裝配成員變數，用於處理 Redis 字符串操作。
+     */
     @Autowired
     private StringRedisTemplate redisTemplate;
-
 
     /**
      * 前往註冊會員頁面。
@@ -56,7 +64,7 @@ public class MemberControllerFrontEnd {
     public String addMemberData(ModelMap modelMap) {
         Member member = new Member();
         modelMap.addAttribute("member", member);
-        return "frontend/member/addMember2";
+        return "frontend/member/addMember3";
     }
 
     /**
@@ -84,7 +92,7 @@ public class MemberControllerFrontEnd {
      */
     @GetMapping("memberCenter")
     public String memberCenter() {
-        return "redirect:frontend/member/memberData";
+        return "redirect:/frontend/member/memberData";
     }
 
     /**
@@ -572,7 +580,7 @@ public class MemberControllerFrontEnd {
         session.setAttribute("loginsuccess", member);
 
         // 重定向到會員中心頁面
-        return "redirect:frontend/member/memberCenter";
+        return "redirect:/frontend/member/memberCenter";
     }
 
     /**

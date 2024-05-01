@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+    <link th:href="@{/css/backend/index/styles.css}" rel="stylesheet" />
+    <link th:href="@{/css/backend/index/index.css}" rel="stylesheet" />
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            box-sizing: border-box;
+        }
+
+        main {
+            margin-top: 30px;
+            padding: 50px 20px;
+            text-align: center; /* 新增這一行，使內容置中 */
+        }
+
+        form {
+            display: inline-block;
+            max-width: 600px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-top: 50px;
+        }
+
+        table {
+            width: 100%;
+            margin-bottom: 20px;
+            border-collapse: collapse;
+            border-spacing: 0;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        input {
+            width: calc(100% - 12px);
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .error {
+            color: red;
+        }
+
+        .submit {
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .submit:hover {
+            background-color: #0056b3;
+        }
+
+        .content {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .text {
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+
+        .field {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 15px;
+        }
+
+        .fas {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .forgot-pass {
+            text-align: right;
+            margin-bottom: 10px;
+        }
+
+        button {
+            padding: 10px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .sign-up {
+            margin-top: 15px;
+            text-align: center;
+        }
+
+        a {
+            color: #007bff;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        #effect h3 {
+            margin: 0;
+            padding: 0.4em;
+            text-align: center;
+            background-color: red;
+        }
+    </style>
+
+    <title>最新消息公告</title>
+
+</head>
+<body>
+    <main> <!-- 修改這裡，將內容置中 -->
+        <h1>最新消息公告</h1>
+        <form method="post" th:action="@{addNotice}" th:object="${notice}" enctype="multipart/form-data">
+            <table>
+                <tr>
+                    <td><label for="motNo">會員通知編號:</label></td>
+                    <td><input type="number" id="motNo" title="請輸入會員通知編號" th:field="*{motNo}"></td>
+                    <td><label class="error" th:if="${#fields.hasErrors('motNo')}" th:errors="*{motNo}"></label></td>
+                </tr>
+
+                <tr>
+                    <td><label for="member.memNo">會員編號:</label></td>
+                    <td><input type="number" id="member.memNo" title="請輸入會員編號:" th:field="*{member.memNo}"></td>
+                    <td><label class="error" th:if="${#fields.hasErrors('member.memNo')}" th:errors="*{member.memNo}"></label></td>
+                </tr>
+
+                <tr>
+                    <td><label for="notContent">通知內容:</label></td>
+                    <td><input type="text" id="notContent" title="請輸入通知內容:" th:field="*{notContent}"></td>
+                    <td><label class="error" th:if="${#fields.hasErrors('notContent')}" th:errors="*{notContent}"></label></td>
+                </tr>
+
+                <tr>
+                    <td><label for="notTime">發送時間：</label></td>
+                    <td><input type="datetime-local" id="notTime" th:field="*{notTime}"></td>
+                    <td><label class="error" th:if="${#fields.hasErrors('notTime')}" th:errors="*{notTime}"></label></td>
+                </tr>
+
+                <tr>
+                    <td><label for="notStat">讀取狀態:</label></td>
+                    <td>
+                        <select id="notStat" title="讀取狀態" th:field="*{notStat}">
+                            <option value="0">未讀</option>
+                            <option value="1">已讀</option>
+                        </select>
+                    </td>
+                    <td>
+                        <label class="error" th:if="${#fields.hasErrors('notStat')}" th:errors="*{notStat}" id="errors"></label>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td><input type="submit" id="submit" value="送出新增"></td>
+                </tr>
+
+            </table>
+        </form>
+        <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+        <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+<!--        <div th:replace="backend/HTMLTool/nav :: nav"></div>-->
+
+    </main>
+</body>
+</html>

@@ -95,13 +95,13 @@
         <div class="input-box">
             <label>會員帳號：<b>*</b></label>
             <input type="text" placeholder="請輸入會員帳號" th:field="*{memAcc}" />
-            <span  th:if="${#fields.hasErrors('memAcc')}" th:errors="*{memAcc}" class="error" id="ename.errors"></span>
+            <span  th:if="${#fields.hasErrors('memAcc')}" th:errors="*{memAcc}" class="error" id="memAcc.errors"></span>
         </div>
 
         <div class="input-box">
             <label>會員密碼：<b>*</b></label>
             <input type="password" placeholder="請輸入會員密碼" th:field="*{memPwd}"/>
-            <span  th:if="${#fields.hasErrors('memPwd')}" th:errors="*{memPwd}" class="error" id="ename.errors"></span>
+            <span  th:if="${#fields.hasErrors('memPwd')}" th:errors="*{memPwd}" class="error" id="memPwd.errors"></span>
         </div>
 
         <div class="column">

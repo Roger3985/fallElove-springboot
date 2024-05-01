@@ -17,6 +17,14 @@ public class NoticeServiceImpl implements NoticeService {
 
 
     /**
+     * 將新的通知添加到資料庫中。
+     */
+    @Override
+    public Notice addNotice(Notice notice) {
+        return noticeRepository.save(notice);
+    }
+
+    /**
      * 從資料庫中查找所有 Notice 實例。
      *
      * 這個方法使用 `noticeRepository` 來執行查詢，並返回所有 NoticeVO 實例的列表。
