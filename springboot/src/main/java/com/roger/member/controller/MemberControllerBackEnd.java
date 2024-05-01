@@ -66,6 +66,22 @@ public class MemberControllerBackEnd {
     }
 
     /**
+     * 復權指定的會員帳號。
+     * 此方法通過接受會員編號(`memNo`)作為參數，使用`memberService.findByNo()`方法查找會員對象，
+     * 然後將該會員的帳號狀態設置為已驗證(狀態值為1)，並使用`memberService.edit()`方法更新會員信息。
+     *
+     * @param memNo 要復權的會員編號。
+     * @return 重定向到會員列表頁面。
+     */
+    @PostMapping("/reMember")
+    public String reMember(@ModelAttribute("memNo") String memNo) {
+        Member member = memberService.findByNo(Integer.valueOf(memNo));
+        member.setMemStat(Byte.valueOf("1"));
+        memberService.edit(member);
+        return "redirect:/backend/member/memberlist";
+    }
+
+    /**
      * 圖片處理方法。
      * 根據請求參數中的會員編號（memno）查找會員的圖片資料，並將圖片作為響應輸出。
      *
