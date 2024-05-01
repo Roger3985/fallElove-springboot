@@ -72,7 +72,6 @@ public interface MemberService {
 
     /**
      * 使用哈希演算法對密碼進行加密。
-     *
      * 該方法接收一個明文密碼，並使用安全的哈希算法（例如:MD5）對其進行哈希加密。
      * 哈希後的密碼可以安全地存儲在資料庫中。
      *
@@ -83,13 +82,20 @@ public interface MemberService {
 
     /**
      * 處理忘記密碼的功能。
-     *
      * 此方法接受會員的註冊信箱，並對會員的密碼進行重置或發送重置密碼的相關訊息。
      *
      * @param memMail 會員的註冊信箱。
      * @return 如果重置密碼的請求成功，則返回 true;否則返回 false
      */
     public boolean forgetPassword(String memMail);
+
+    /**
+     * 停權會員。
+     * 此方法根據會員編號停權會員的帳號。
+     *
+     * @param memNo 會員編號。
+     */
+    public void banMem(Integer memNo);
 
     /**
      * 檢查會員帳號是否在系統中存在。

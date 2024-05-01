@@ -231,6 +231,15 @@ public class MemberServiceImpl implements MemberService {
     }
 
     /**
+     * 停權會員。
+     */
+    @Override
+    public void banMem(Integer memNo) {
+        Member data = memberRepository.findById(memNo).orElse(null);
+        memberRepository.updateMemStatById(memNo, Byte.valueOf("2"));
+    }
+
+    /**
      * 檢查會員帳號是否在系統中存在。
      */
     @Override

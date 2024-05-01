@@ -70,4 +70,16 @@ public interface MemberRepository extends JpaRepository<Member, Integer> {
     @Query("UPDATE Member SET memPic = :memPic WHERE memNo = :memNo")
     public void updateMemPicById(@Param("memNo") Integer memNo, @Param("memPic") byte[] memPic);
 
+    /**
+     * 更新會員帳號狀態的方法。
+     * 此方法接受會員編號和新的帳號狀態，並將會員的帳號狀態更新為提供的狀態。
+     *
+     * @param memNo 會員編號。
+     * @param memStat 新的帳號狀態。
+     */
+    @Transactional
+    @Modifying
+    @Query("UPDATE Member SET memStat = :memStat WHERE memNo = :memNo")
+    public void updateMemStatById(@Param("memNo") Integer memNo, @Param("memStat") Byte memStat);
+
 }

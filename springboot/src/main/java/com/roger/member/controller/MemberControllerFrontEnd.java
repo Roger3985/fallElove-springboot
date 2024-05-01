@@ -541,7 +541,8 @@ public class MemberControllerFrontEnd {
      * @return 如果發生錯誤，返回變更密碼的頁面名稱；如果成功，方法返回 null 並重定向到會員中心頁面。
      */
     @PostMapping("/changePassword")
-    public String changePassword(@RequestParam("oldPassword") String oldPassword, @RequestParam("newPassword") String newPassword,
+    public String changePassword(@RequestParam("oldPassword") String oldPassword,
+                                 @RequestParam("newPassword") String newPassword,
                                  ModelMap modelMap, HttpSession session) {
 
         // 從會話中獲取當前登入的會員訊息
