@@ -1,5 +1,6 @@
 package com.roger.report.service.impl;
 
+import com.roger.member.entity.Member;
 import com.roger.report.entity.Report;
 import com.roger.report.repository.ReportRepository;
 import com.roger.report.service.ReportService;
@@ -45,5 +46,13 @@ public class ReportServiceImpl implements ReportService {
     @Override
     public List<Report> getAll() {
         return reportRepository.findAll();
+    }
+
+    /**
+     * 根據指定的會員獲取該會員提交的所有回覆檢舉。
+     */
+    @Override
+    public List<Report> getAllByMem(Member member) {
+        return reportRepository.findByMember(member);
     }
 }

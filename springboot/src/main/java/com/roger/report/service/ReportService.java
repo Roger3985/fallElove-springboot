@@ -1,5 +1,6 @@
 package com.roger.report.service;
 
+import com.roger.member.entity.Member;
 import com.roger.report.entity.Report;
 
 import java.util.List;
@@ -31,4 +32,13 @@ public interface ReportService {
      * @return 包含所有回覆檢舉的列表。如果沒有回覆檢舉，則返回一個空的回覆檢舉列表。
      */
     public List<Report> getAll();
+
+    /**
+     * 根據指定的會員獲取該會員提交的所有回覆檢舉。
+     * 此方法接受一個 `Member` 物件，並返回該會員提交的所有回覆檢舉的列表。
+     *
+     * @param member 指定的會員物件，用於查找該會員提交的回覆檢舉。
+     * @return 該會員提交的所有回覆檢舉的列表。如果該會員沒有提交任何回覆檢舉，則返回一個空列表。
+     */
+    public List<Report> getAllByMem(Member member);
 }
