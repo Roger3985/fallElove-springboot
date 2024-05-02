@@ -1,9 +1,10 @@
 package com.roger.member.service.impl;
 
-import com.roger.member.dao.MemberRepository;
+import com.roger.member.repository.MemberRepository;
 import com.roger.member.entity.Member;
 import com.roger.member.service.MemberService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
@@ -12,6 +13,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
@@ -261,6 +263,15 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public boolean existMemMail(String memMail) {
         return memberRepository.existsByMemMail(memMail);
+    }
+
+    /**
+     * 根據會員編號（memNo）查找會員。
+     */
+    @Override
+    public Member getMemberByMemNo(Integer memNo) {
+        Optional<Member> member = memberRepository.findMemberByMemNo(memNo);
+        return member.orElse(null);
     }
 
     /**

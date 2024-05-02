@@ -64,7 +64,7 @@ public class MemberControllerFrontEnd {
     public String addMemberData(ModelMap modelMap) {
         Member member = new Member();
         modelMap.addAttribute("member", member);
-        return "frontend/member/addMember3";
+        return "frontend/member/addMember";
     }
 
     /**

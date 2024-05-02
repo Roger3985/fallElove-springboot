@@ -20,13 +20,7 @@ public class NoticeControllerFrontEnd {
     @Autowired
     private NoticeServiceImpl noticeService;
 
-    // 全部json到前端
-    @GetMapping("/getAllNotice")
-    public ResponseEntity<List<Notice>> getAllNotices() {
-        Notice notice = new Notice();
-        List<Notice> notices = noticeService.getAll();
-        return ResponseEntity.status(HttpStatus.OK).body(notices);
-    }
+
 
 
 

@@ -1,6 +1,8 @@
 package com.roger.member.service;
 
 import com.roger.member.entity.Member;
+import org.springframework.data.domain.Page;
+
 import java.util.List;
 
 public interface MemberService {
@@ -123,4 +125,15 @@ public interface MemberService {
      * @return 如果會員信箱存在，返回 `true`；否則返回 `false`。
      */
     public boolean existMemMail(String memMail);
+
+
+    /**
+     * 根據會員編號（memNo）查找會員。
+     * 此方法接受會員編號作為參數，並返回與該編號匹配的會員對象。
+     * 如果找不到匹配的會員，則返回 null。
+     *
+     * @param memNo 會員編號。
+     * @return 與給定會員編號匹配的會員對象；如果找不到匹配的會員，則返回 null。
+     */
+    public Member getMemberByMemNo(Integer memNo);
 }

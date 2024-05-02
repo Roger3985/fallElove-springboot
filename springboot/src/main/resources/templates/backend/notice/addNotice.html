@@ -192,9 +192,46 @@
 
             </table>
         </form>
+<!--        <script>-->
+<!--            // 根據所需格式格式化日期和時間的函數-->
+<!--            function formatDateTime(dateTimeString) {-->
+<!--                const date = new Date(dateTimeString);-->
+
+<!--                // 提取日期和時間的各個部分-->
+<!--                const year = date.getFullYear();-->
+<!--                const month = String(date.getMonth() + 1).padStart(2, '0');-->
+<!--                const day = String(date.getDate()).padStart(2, '0');-->
+<!--                const hours = String(date.getHours()).padStart(2, '0');-->
+<!--                const minutes = String(date.getMinutes()).padStart(2, '0');-->
+<!--                const seconds = String(date.getSeconds()).padStart(2, '0');-->
+
+<!--                // 組合為 "yyyy-MM-ddThh:mm:ss" 格式-->
+<!--                return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;-->
+<!--            }-->
+
+<!--            // 附加表單提交事件的事件監聽器-->
+<!--            document.querySelector('form').addEventListener('submit', function (event) {-->
+<!--                // 阻止表單立即提交-->
+<!--                event.preventDefault();-->
+
+<!--                // 獲取 notTime 輸入字段-->
+<!--                const notTimeInput = document.getElementById('notTime');-->
+
+<!--                // 在 notTime 輸入字段中格式化日期和時間值-->
+<!--                const formattedDateTime = formatDateTime(notTimeInput.value);-->
+
+<!--                // 使用格式化的值更新 notTime 輸入字段-->
+<!--                notTimeInput.value = formattedDateTime;-->
+
+<!--                // 使用正確的表單對象提交表單-->
+<!--                event.target.submit();-->
+<!--            });-->
+<!--        </script>-->
+
         <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
         <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
 <!--        <div th:replace="backend/HTMLTool/nav :: nav"></div>-->
+
 
     </main>
 </body>

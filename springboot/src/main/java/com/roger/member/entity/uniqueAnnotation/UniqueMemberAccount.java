@@ -1,6 +1,6 @@
 package com.roger.member.entity.uniqueAnnotation;
 
-import com.roger.member.dao.MemberRepository;
+import com.roger.member.repository.MemberRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.validation.Constraint;

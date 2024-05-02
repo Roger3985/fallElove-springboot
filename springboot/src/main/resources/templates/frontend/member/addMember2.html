@@ -186,9 +186,9 @@
         <br><br>
 
         <label class="btn btn-info">
-            <input id="upload_img" name="uploadImg" style="display:none;" type="file" accept="image/*">
+            <input id="upload_img" name="memPic" style="display:none;" type="file" accept="image/*">
             <!-- 隱藏的輸入字段，用於儲存裁剪後的圖片數據，施工中 -->
-            <input type="hidden" name="croppedImage" id="croppedImage" value="" th:field="*{memPic}">
+            <input type="text" name="croppedImage" id="croppedImage" value="" th:field="*{memPic}">
             <span th:if="${#fields.hasErrors('memPic')}" th:errors="*{memPic}" class="error"></span>
             <i class="fa fa-photo"></i> 上傳圖片
         </label>

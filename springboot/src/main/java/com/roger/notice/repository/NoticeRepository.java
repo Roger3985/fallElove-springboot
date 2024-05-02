@@ -1,8 +1,7 @@
-package com.roger.notice.dao;
+package com.roger.notice.repository;
 
 import com.roger.member.entity.Member;
 import com.roger.notice.entity.Notice;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;

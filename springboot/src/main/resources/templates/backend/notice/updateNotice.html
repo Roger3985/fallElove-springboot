@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+    <link th:href="@{/css/backend/index/styles.css}" rel="stylesheet" />
+    <link th:href="@{/css/backend/index/index.css}" rel="stylesheet" />
+  <title>更新會員通知信息</title>
+</head>
+<body>
+<!--    <div th:replace="BackStage/HTMLTool/nav :: nav"></div>-->
+    <form method="post" th:action="@{updateNotice}" th:object="${data}" enctype="multipart/form-data">
+        <table>
+            <tr>
+
+            </tr>
+        </table>
+    </form>
+</body>
+</html>
