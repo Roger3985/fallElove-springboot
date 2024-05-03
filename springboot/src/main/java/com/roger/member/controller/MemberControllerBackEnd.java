@@ -38,7 +38,7 @@ public class MemberControllerBackEnd {
     }
 
     /**
-     * 提供所有會員資料列表供試圖渲染使用。
+     * 提供所有會員資料列表供視圖渲染使用。
      * 此方法使用`@ModelAttribute`註解，確保在處理請求時可用於視圖中的`memListData`屬性。
      * 該屬性是一個包含所有會員的列表，由`memberService.findAll()`方法獲取。
      *

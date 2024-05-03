@@ -1,4 +1,4 @@
-package com;
+package com.config;
 
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.context.annotation.Configuration;

@@ -33,6 +33,12 @@ import java.util.stream.Collectors;
 @RequestMapping("/frontend/member")
 public class MemberControllerFrontEnd {
 
+    // 前往後台管理首頁
+    @GetMapping("/frontendEndIndex")
+    public String frontendEndIndex() {
+        return "frontend/index";
+    }
+
     /**
      * MemberService 的自動裝配成員變數，用於處理會員相關的服務。
      */
@@ -78,8 +84,19 @@ public class MemberControllerFrontEnd {
      */
     @GetMapping("/memberData")
     public String memberData(ModelMap modelMap, HttpSession session) {
+
+        // 從 HTTP 會話中獲取當前已登入的會員資料
         Member myData = (Member) session.getAttribute("loginsuccess");
+
+        // 如果會員未登錄，重定向到登錄頁面
+        if (myData == null) {
+            return "redirect:/frontend/member/loginMember";
+        }
+
+        // 將會員資料添加到模型中
         modelMap.addAttribute("myData", myData);
+
+        // 返回要呈現的視圖名稱
         return "frontend/member/oneMember";
     }
 

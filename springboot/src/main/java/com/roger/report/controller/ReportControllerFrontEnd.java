@@ -76,7 +76,7 @@ public class ReportControllerFrontEnd {
      * @return 當表單驗證失敗時，返回新增回覆檢舉頁面。當驗證成功時，重定向到用戶的檢舉列表頁面。
      * @throws IOException 當執行過程中發生I/O異常時拋出。
      */
-    @PostMapping("addReport")
+    @PostMapping("/addReport")
     public String addReport(@Valid Report report,
                             BindingResult result,
                             ModelMap modelMap,
