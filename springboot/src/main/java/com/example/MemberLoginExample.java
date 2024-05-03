@@ -17,6 +17,8 @@ import javax.servlet.http.HttpSession;
 @Component
 public class MemberLoginExample {
 
+    // TODO: 添加與會員登錄相關的方法與屬性 (TODO 是一種常見的註釋或標記，用來提醒開發者未來需要進行的工作、未完成的功能或需要改善的地方。)
+
     /**
      * 前往登入頁面。
      * 此方法處理 HTTP GET 請求到 '/frontend/member/loginMember' URL 路徑。

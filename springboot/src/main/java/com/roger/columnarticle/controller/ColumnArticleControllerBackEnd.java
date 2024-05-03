@@ -25,7 +25,6 @@ public class ColumnArticleControllerBackEnd {
     @Autowired
     private StringRedisTemplate redisTemplate;
 
-
     /**
      * 處理列出所有專欄文章的請求。
      * 此方法處理對 '/backend/columnarticle/listAllColumnArticle' 的 GET 請求，並返回顯示所有專欄文章的視圖。
@@ -55,10 +54,8 @@ public class ColumnArticleControllerBackEnd {
     @GetMapping("/updateColumnArticleData")
     public String updateColumnArticleData(ModelMap modelMap, HttpSession session) {
 
-        // 從會話中獲取當前登錄的管理員
-        Administrator administrator = (Administrator) session.getAttribute("ValidAdministrator");
 
-        return "1";
+
     }
 
 
