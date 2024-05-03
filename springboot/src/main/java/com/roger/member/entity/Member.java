@@ -41,8 +41,8 @@ public class Member implements java.io.Serializable {
 
     @NotBlank(message = "會員姓名: 請勿空白")
     @Pattern(regexp = "^[(\u4e00-\u9fa5)(a-zA-Z0-9_)]{2,10}$", message = "會員姓名: 只能是中、英文字母、數字和_")
-    @Column(name = "mname")
-    private String mName;
+    @Column(name = "memname")
+    private String memName;
 
     @NotBlank(message = "會員帳號: 請勿空白")
     @Pattern(regexp = "^[a-zA-Z0-9]{4,10}$", message = "會員帳號: 只能是英文字母、數字")
@@ -61,8 +61,8 @@ public class Member implements java.io.Serializable {
     private String memMob;
 
     @NotNull(message = "請輸入性別")
-    @Column(name = "mgender")
-    private Byte mGender;
+    @Column(name = "memgender")
+    private Byte memGender;
 
     @NotBlank(message = "會員信箱: 請勿空白!")
     @Pattern(regexp = "^[\\w-_\\.+]*[\\w-_\\.]\\@([\\w]+\\.)+[\\w]+[\\w]$", message = "信箱格式輸入錯誤！")
@@ -166,13 +166,13 @@ public class Member implements java.io.Serializable {
         this.memNo = memNo;
     }
 
-    public Member(Integer memNo, String mName, String memAcc, String memPwd, String memMob, Byte mGender, String memMail, String memAdd, Date memBd, String memCard, Byte provider, String clientID, String displayName, String accessToken, String refreshToken, Timestamp tknExpireTime, Timestamp creationTime, Timestamp memberJoinTime, Byte memStat, String memSalt, byte[] memPic) {
+    public Member(Integer memNo, String memName, String memAcc, String memPwd, String memMob, Byte memGender, String memMail, String memAdd, Date memBd, String memCard, Byte provider, String clientID, String displayName, String accessToken, String refreshToken, Timestamp tknExpireTime, Timestamp creationTime, Timestamp memberJoinTime, Byte memStat, String memSalt, byte[] memPic) {
         this.memNo = memNo;
-        this.mName = mName;
+        this.memName = memName;
         this.memAcc = memAcc;
         this.memPwd = memPwd;
         this.memMob = memMob;
-        this.mGender = mGender;
+        this.memGender = memGender;
         this.memMail = memMail;
         this.memAdd = memAdd;
         this.memBd = memBd;
@@ -198,12 +198,12 @@ public class Member implements java.io.Serializable {
         this.memNo = memNo;
     }
 
-    public String getmName() {
-        return mName;
+    public String getMemName() {
+        return memName;
     }
 
-    public void setmName(String mName) {
-        this.mName = mName;
+    public void setMemName(String memName) {
+        this.memName = memName;
     }
 
     public String getMemAcc() {
@@ -230,12 +230,12 @@ public class Member implements java.io.Serializable {
         this.memMob = memMob;
     }
 
-    public Byte getmGender() {
-        return mGender;
+    public Byte getMemGender() {
+        return memGender;
     }
 
-    public void setmGender(Byte mGender) {
-        this.mGender = mGender;
+    public void setMemGender(Byte memGender) {
+        this.memGender = memGender;
     }
 
     public String getMemMail() {

@@ -25,7 +25,7 @@
             </nav>
             <div class="user-info">
 				<th:block th:if="${session.loginsuccess}">
-                	<span th:text="${session.loginsuccess.mName}"></span>
+                	<span th:text="${session.loginsuccess.memName}"></span>
                 	<input type="hidden" id="userId" th:value="${session.loginsuccess.memNo}"></span>
                 	<img th:src="@{/frontend/member/picture} + '?memno=' + ${session.loginsuccess.memNo}" style="margin-right:5px;"width="30px" height="30px">
 <!--                	<img id="message" th:src="@{/icon/frontend/member/newMessage.png}" width="30px" height="30px">-->

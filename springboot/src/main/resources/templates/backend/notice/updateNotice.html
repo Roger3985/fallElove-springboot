@@ -9,13 +9,36 @@
   <title>更新會員通知信息</title>
 </head>
 <body>
-<!--    <div th:replace="BackStage/HTMLTool/nav :: nav"></div>-->
+    <div th:replace="backend/HTMLTool/nav :: nav"></div>
     <form method="post" th:action="@{updateNotice}" th:object="${data}" enctype="multipart/form-data">
         <table>
             <tr>
-
+                <td><label for="motNo">會員通知編號：</label></td>
+                <td><input id="motNo" title="會員通知編號" th:field="*{motNo}" readonly></td>
+                <td><span  th:if="${#fields.hasErrors('motNo')}" th:errors="*{motNo}" class="error" id="motNo.errors"></span></td>
+            </tr>
+            <tr>
+                <td><label for="memNo">會員編號：</label></td>
+                <td><input id="memNo" th:field="*{member.memNo}" title="請輸入編號"></td>
+                <td><span  th:if="${#fields.hasErrors('memNo')}" th:errors="*{member.memNo}" class="error" id="member.memNo.errors"></span></td>
+            </tr>
+            <tr>
+                <td><label for="notContent">通知內容</label></td>
+                <td><input id="notContent" title="通知內容" th:field="*{notContent}" ></td>
+                <td><span  th:if="${#fields.hasErrors('notContent')}" th:errors="*{notContent}" class="error" id="notContent.errors"></span></td>
+            </tr>
+            <tr>
+                <td><label for="notTime">發送時間：</label></td>
+                <td><input type="datetime-local" id="notTime" th:field="*{notTime}"></td>
+                <td><span  th:if="${#fields.hasErrors('notTime')}" th:errors="*{notTime}" class="error" id="notTime.errors"></span></td>
+            </tr>
+            <tr>
+                <td><label for="notStat">讀取狀態：</label></td>
+                <td><input id="notStat" title="讀取狀態" th:field="*{notStat}" ></td>
+                <td><span  th:if="${#fields.hasErrors('notStat')}" th:errors="*{notStat}" class="error" id="notStat.errors"></span></td>
             </tr>
         </table>
+        <input type="submit" class="submit" value="修改資料">
     </form>
 </body>
 </html>

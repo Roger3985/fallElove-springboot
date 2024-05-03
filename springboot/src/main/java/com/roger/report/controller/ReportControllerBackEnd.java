@@ -1,16 +1,15 @@
 package com.roger.report.controller;
 
 import com.ren.administrator.entity.Administrator;
+import com.roger.member.entity.Member;
 import com.roger.report.entity.Report;
 import com.roger.report.service.ReportService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
@@ -21,8 +20,13 @@ import java.util.List;
 @RequestMapping("/backend/report")
 public class ReportControllerBackEnd {
 
+    public Member member;
+
     @Autowired
     ReportService reportService;
+
+    @Autowired
+    private StringRedisTemplate redisTemplate;
 
     /**
      * 處理 GET 請求以顯示所有回覆檢舉的列表。
@@ -34,7 +38,7 @@ public class ReportControllerBackEnd {
      */
     @GetMapping("/listAllReport")
     public String listAllReport(Model model) {
-        return "backend/report/listAllReport";
+        return "/backend/report/listAllReport";
     }
 
     /**
@@ -81,6 +85,96 @@ public class ReportControllerBackEnd {
 
         // 在模型中添加回覆檢舉物件以供前端顯示
         modelMap.addAttribute("report", report);
+
+        // 重定向到回覆檢舉列表頁面
+        return "redirect:/backend/report/listAllReport";
+    }
+
+//    @PostMapping("/updateReportStatus")
+//    public String updateReportStatus(@RequestParam("memNo") String memNo,
+//                                     @RequestParam("reportType") Byte reportType) {
+//        try {
+//            Integer memberNo = Integer.valueOf(memNo);
+//
+//            // 更新檢舉報告狀態
+//            reportService.updateReportByReportType(memberNo, reportType);
+//
+//            // 更新 Redis 中的資料
+//            String key = "noType:reports" + memNo;
+//            if (reportType == 0) {
+//                redisTemplate.opsForValue().set(key, memNo);
+//            } else if (reportType == 1) {
+//                redisTemplate.delete(key);
+//            }
+//
+//        } catch (NumberFormatException e) {
+//            // 處理數字格式異常
+//            System.err.println("無效的會員編號:" + memNo);
+//            return "redirect:/backend/report/listAllReport";
+//
+//        } catch (Exception e) {
+//            // 處理其他的異常
+//            e.printStackTrace();
+//            return "redirect:/backend/report/listAllReport";
+//        }
+
+//        // 成功更新後重定向到報告列表頁面
+//        return "redirect:/backend/report/listAllReport";
+//    }
+
+    /**
+     * 修改已處理的檢舉回覆。
+     * 該方法接受要處理的 `reportNo`（檢舉編號），並使用 `reportService` 處理與該檢舉編號相關的檢舉。
+     * 此外，該方法還更新了 Redis 中與該檢舉編號的檢舉資料。
+     *
+     * @param reportNo 要處理的檢舉編號。
+     * @return 處理成功後重定向到 `/backend/report/listAllReport` 頁面。
+     */
+    @PostMapping("/noTypeReport")
+    public String noTypeReport(@ModelAttribute("reportNo") String reportNo) {
+
+        // 查找與會員編號相關的回覆檢舉
+        Report report = reportService.findReportByReportNo(Integer.valueOf(reportNo));
+
+        // 將回覆檢舉的審核狀態設至為未處理的狀態
+        report.setReportType(Byte.valueOf("0"));
+
+        // 更新回覆檢舉
+        reportService.edit(report);
+
+        // 更新 Redis 存儲
+        redisTemplate.opsForValue().set("noType:reports" + reportNo, reportNo);
+
+        // 重定向到回覆檢舉列表頁面
+        return "redirect:/backend/report/listAllReport";
+    }
+
+    /**
+     * 處理指定檢舉編號的未處理檢舉回覆。
+     * 該方法接受要處理的 `reportNo`（檢舉編號），並查找與該檢舉編號相關的回覆檢舉。
+     * 然後將報告的類型設置為已處理狀態，並更新回覆檢舉。
+     * 最後，如果 Redis 中存在與該檢舉編號相關的鍵，則將其刪除。
+     *
+     * @param reportNo 要處理的檢舉編號。
+     * @return 處理成功後重定向到 `/backend/report/listAllReport` 頁面。
+     */
+    @PostMapping("/reNoTypeReport")
+    public String reNoTypeReport(@ModelAttribute("reportNo") String reportNo) {
+
+        // 查找與會員編號相關的回覆檢舉
+        Report report = reportService.findReportByReportNo(Integer.valueOf(reportNo));
+
+        // 將回覆檢舉的審核狀態設置為已處理狀態
+        report.setReportType(Byte.valueOf("1"));
+
+        // 更新回覆檢舉
+        reportService.edit(report);
+
+        // 檢查 Redis 中的鍵是否存在，如果存在則刪除
+        String key = "noType:reports" + reportNo;
+        if (Boolean.TRUE.equals(redisTemplate.hasKey(key))) {
+            redisTemplate.delete(key);
+        }
 
         // 重定向到回覆檢舉列表頁面
         return "redirect:/backend/report/listAllReport";

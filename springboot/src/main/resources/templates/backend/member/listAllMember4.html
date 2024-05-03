@@ -34,7 +34,7 @@
 </head>
 <body>
 
-<div th:replace="backend/listAll :: nav"></div>
+<!--<div th:replace="backend/HTMLTool/nav :: nav"></div>-->
 
 <main>
     <h1>會員查詢</h1>
@@ -91,7 +91,7 @@
                     <form method="post" th:action="@{banMember}">
                         <input type="hidden" name="memNo" th:value="${member.memNo}">
                         <input type="submit" value="停權" th:if="${member.memStat != 2}" style="background-color: #3498db; /* 藍色背景顏色 */
-                    </form>color: #fff; /* 白色文字顏色 */
+                                                        color: #fff; /* 白色文字顏色 */
                                                         border: none; /* 去掉邊框 */
                                                         padding: 10px 10px; /* 內邊距 */
                                                         cursor: pointer; /* 鼠標懸停效果 */

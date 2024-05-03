@@ -117,9 +117,11 @@ public class NoticeControllerBackEnd {
     public String updateNotice(@ModelAttribute("data") @Valid Notice notice,
                                BindingResult result,
                                ModelMap modelMap) throws IOException {
+
         System.out.println(notice);
         System.out.println(result.getErrorCount());
         System.out.println(result.getFieldErrorCount());
+
         if (result.hasErrors()) {
             System.out.println(result.getAllErrors());
             return "backend/notice/updateNotice";

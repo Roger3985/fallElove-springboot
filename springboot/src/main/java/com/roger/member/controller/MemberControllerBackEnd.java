@@ -3,18 +3,14 @@ package com.roger.member.controller;
 import com.roger.member.entity.Member;
 import com.roger.member.service.MemberService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.awt.print.Pageable;
 import java.io.IOException;
 import java.util.List;
 
@@ -34,7 +30,7 @@ public class MemberControllerBackEnd {
      * 返回呈現所有會員列表的視圖名稱。
      *
      * @param modelMap 包含模型屬性的 'ModelMap'。
-     * @return 要呈現的視圖名稱 "listAllMember.html"。
+     * @return 要呈現的視圖名稱 "listAllMember4.html"。
      */
     @GetMapping("/memberlist")
     public String showList(ModelMap modelMap) {

@@ -51,11 +51,11 @@ DROP TABLE IF EXISTS ServiceRobot;
 CREATE TABLE Member
 (
     memNo          INT          NOT NULL PRIMARY KEY AUTO_INCREMENT,
-    mName          VARCHAR(20)  NOT NULL,
+    memName          VARCHAR(20)  NOT NULL,
     memAcc         VARCHAR(20)  NOT NULL UNIQUE,
     memPwd         VARCHAR(32)  NOT NULL,
     memMob         VARCHAR(20)  NOT NULL UNIQUE,
-    mGender        TINYINT      NULL,
+    memGender        TINYINT      NULL,
     memMail        VARCHAR(40)  NOT NULL,
     memAdd         VARCHAR(100) NOT NULL UNIQUE,
     memBd          DATE         NULL,
@@ -73,7 +73,7 @@ CREATE TABLE Member
     memPic	       LONGBLOB 		NULL
 );
 
-INSERT INTO Member(mName, memAcc, memPwd, memMob, mGender, memMail, memAdd, memBd, memCard, provider, clientID, displayName, accessToken, refreshToken, tknExpireTime, creationTime, memberJoinTime, memStat, memSalt, memPic) VALUES
+INSERT INTO Member(memName, memAcc, memPwd, memMob, memGender, memMail, memAdd, memBd, memCard, provider, clientID, displayName, accessToken, refreshToken, tknExpireTime, creationTime, memberJoinTime, memStat, memSalt, memPic) VALUES
 ('John', 'John123', '123456', '0912345678', 1, 'John123@gmail.com','台北市大安區忠孝東路四段100號', '1990-01-15', '411235678901234', NULL, NULL, NULL, NULL, NULL, NULL, NULL, CURRENT_TIMESTAMP, 0, '1', null),
 ('Emma', 'Emma456', 'abcdef', '0987654321', 2, 'Emma456@gmail.com','新北市板橋區文化路二段50巷20號', '1985-03-28', '510510510510510', NULL, NULL, NULL, NULL, NULL, NULL, NULL, CURRENT_TIMESTAMP, 0,'2', null),
 ('Michael', 'Michael789', 'qwerty', '0965412378', 1, 'Michael789@gmail.com','台中市西屯區市政北二路100號', '1998-07-10', '378282246310005', NULL, NULL, NULL, NULL, NULL, NULL, NULL, CURRENT_TIMESTAMP, 2, '3', null),

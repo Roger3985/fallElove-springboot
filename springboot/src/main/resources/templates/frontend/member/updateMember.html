@@ -68,8 +68,8 @@
             </table>
             <div class="input-box">
                 <label>姓名：<b>*</b></label>
-                <input type="text" placeholder="請輸入姓名" th:field="*{mName}" />
-                <span th:if="${#fields.hasErrors('mName')}" th:errors="*{mName}" class="error"></span>
+                <input type="text" placeholder="請輸入姓名" th:field="*{memName}" />
+                <span th:if="${#fields.hasErrors('memName')}" th:errors="*{memName}" class="error"></span>
             </div>
 
             <div class="input-box">
@@ -95,16 +95,16 @@
                 <h3>性別：<b>*</b></h3>
                 <div class="gender-option">
                     <div class="gender">
-                        <input type="radio" id="check-male"  th:field="*{mGender}" th:value="0"/>
+                        <input type="radio" id="check-male"  th:field="*{memGender}" th:value="0"/>
                         <label for="check-male">男性</label>
                     </div>
                     <div class="gender">
-                        <input type="radio" id="check-female"  th:field="*{mGender}" th:value="1"/>
+                        <input type="radio" id="check-female"  th:field="*{memGender}" th:value="1"/>
                         <label for="check-female">女性</label>
                     </div>
                 </div>
             </div>
-            <span th:if="${#fields.hasErrors('mGender')}" th:errors="*{mGender}" class="error"></span>
+            <span th:if="${#fields.hasErrors('memGender')}" th:errors="*{memGender}" class="error"></span>
 
             <div class="input-box">
                 <label>信箱:<b>*</b></label>
@@ -147,11 +147,11 @@
 
             <input type="file" th:field= "*{memPic}" id="the_file">
             <input type="hidden" th:field="*{memNo}">
-            <input type="hidden" th:field="*{mName}">
+            <input type="hidden" th:field="*{memName}">
             <input type="hidden" th:field="*{memAcc}">
             <input type="hidden" th:field="*{memPwd}">
             <input type="hidden" th:field="*{memMob}">
-            <input type="hidden" th:field="*{mGender}">
+            <input type="hidden" th:field="*{memGender}">
             <input type="hidden" th:field="*{memMail}">
             <input type="hidden" th:field="*{memAdd}">
             <input type="hidden" th:field="*{memBd}">
