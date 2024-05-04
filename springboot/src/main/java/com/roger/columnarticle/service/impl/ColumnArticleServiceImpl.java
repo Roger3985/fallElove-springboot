@@ -32,4 +32,12 @@ public class ColumnArticleServiceImpl implements ColumnArticleService {
         return columnArticleRepository.findAll();
     }
 
+    /**
+     * 獲取指定文章編號的文章專欄。
+     */
+    @Override
+    public ColumnArticle getOneColumnArticle(Integer artNo) {
+        return columnArticleRepository.findColumnArticleByArtNo(artNo);
+    }
+
 }

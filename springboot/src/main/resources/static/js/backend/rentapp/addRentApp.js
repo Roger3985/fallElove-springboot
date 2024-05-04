@@ -106,32 +106,32 @@ const database = {
     '澎湖縣': {'馬公市': '880', '西嶼鄉': '881', '望安鄉': '882', '七美鄉': '883', '白沙鄉': '884', '湖西鄉': '885'}
 };
 
-const county_box = document.querySelector('#county_box');
+const country_box = document.querySelector('#country_box');
 const district_box = document.querySelector('#district_box');
 
-let selected_county;
+let selected_country;
 
-Object.getOwnPropertyNames(database).forEach((county) => {
-    county_box.innerHTML += `<option value="${county}">${county}</option>`;
+Object.getOwnPropertyNames(database).forEach((country) => {
+    country_box.innerHTML += `<option value="${country}">${country}</option>`;
 });
 
-county_box.addEventListener('change', () => {
+country_box.addEventListener('change', () => {
 
-    selected_county = county_box.options[county_box.selectedIndex].value;
+    selected_country = country_box.options[country_box.selectedIndex].value;
 
     district_box.innerHTML = '<option value="">選擇鄉鎮市區</option>';
 
 
 
-    Object.getOwnPropertyNames(database[selected_county]).forEach((district) => {
+    Object.getOwnPropertyNames(database[selected_country]).forEach((district) => {
         district_box.innerHTML += `<option value="${district}">${district}</option>`;
     });
 })
 document.addEventListener('DOMContentLoaded',()=>{
-    var select=county_box.options[county_box.selectedIndex].value
+    var select=country_box.options[country_box.selectedIndex].value
 
     if(select==''){
-        county_box.value="基隆市"
+        country_box.value="基隆市"
         Object.getOwnPropertyNames(database["基隆市"]).forEach((district) => {
             district_box.innerHTML += `<option value="${district}">${district}</option>`;
         });

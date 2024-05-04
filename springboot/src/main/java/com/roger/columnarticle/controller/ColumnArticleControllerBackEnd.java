@@ -50,11 +50,36 @@ public class ColumnArticleControllerBackEnd {
         return list;
     }
 
-    // 前往專欄文章修改頁面
+    /**
+     * 前往專欄文章修改頁面。
+     * 此方法處理 HTTP GET 請求到 '/backend/columnarticle/updateColumnArticleData' URL 路徑，
+     * 並接收文章編號 'artNo'作為請求參數。
+     *
+     * @param modelMap 包含模型屬性的 'ModelMap'。
+     * @param session HTTP 會話物件，用於訪問當前登錄的管理員帳號。
+     * @param artNo 專欄文章的編號，作為請求參數傳入。
+     * @return 如果管理員未登錄，則重定向至管理員登錄頁面；否則返回專欄文章修改頁面的視圖名稱。
+     */
     @GetMapping("/updateColumnArticleData")
-    public String updateColumnArticleData(ModelMap modelMap, HttpSession session) {
+    public String updateColumnArticleData(ModelMap modelMap,
+                                          HttpSession session,
+                                          @ModelAttribute("artNo") String artNo) {
 
+        // 從會話中獲取當前登錄的管理員
+        Administrator myData = (Administrator) session.getAttribute("ValidAdministrator");
 
+        if (myData == null) {
+            // 未登錄管理員帳號，重定向到管理員的頁面
+            return "redirect:/backend/administrator/loginAdministrator";
+        }
+
+        System.out.println(artNo);
+        ColumnArticle oldData = columnArticleService.getOneColumnArticle(Integer.valueOf(artNo));
+        System.out.println("test" + oldData);
+
+        modelMap.addAttribute("data", oldData);
+
+        return "backend/columnarticle/updateColumnArticle";
 
     }
 

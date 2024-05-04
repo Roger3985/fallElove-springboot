@@ -110,9 +110,18 @@
         </div>
 
         <div class="input-box">
-            <label>會員密碼：<b>*</b></label>
-            <input type="password" placeholder="請輸入會員密碼" th:field="*{memPwd}"/>
-            <span  th:if="${#fields.hasErrors('memPwd')}" th:errors="*{memPwd}" class="error" id="ename.errors"></span>
+            <label>姓名：<b>*</b></label>
+            <input type="text" placeholder="請輸入姓名" th:field="*{memName}" />
+
+            <!-- 空白錯誤 -->
+            <span th:if="${#fields.hasErrors('memName') and #fields.errors('memName')[0].code == 'NotBlank'}" class="error">
+        請勿空白。
+    </span>
+
+            <!-- 其他錯誤 -->
+            <span th:if="${#fields.hasErrors('memName') and #fields.errors('memName')[0].code != 'NotBlank'}" th:errors="*{memName}" class="error">
+        <!-- 顯示錯誤消息 -->
+    </span>
         </div>
 
         <div class="column">
@@ -139,17 +148,36 @@
         <span th:if="${#fields.hasErrors('memGender')}" th:errors="*{memGender}" class="error"></span>
 
         <div class="input-box">
-            <label>信箱:<b>*</b></label>
+            <label>信箱：<b>*</b></label>
             <div class="email-input-container">
-                <input type="text" placeholder="請輸入信箱帳號" th:field="*{memMail}" />
-                <select th:field="*{memMail}" class="email-provider-select">
+                <!-- 占位符使用繁體中文 -->
+                <input type="text" placeholder="請輸入信箱帳號" id="localPart" />
+                <!-- 選擇框中的選項使用繁體中文 -->
+                <select id="domainPart" class="email-provider-select">
                     <option value="@gmail.com">@gmail.com</option>
                     <option value="@yahoo.com">@yahoo.com</option>
                     <option value="@outlook.com">@outlook.com</option>
                     <option value="@icloud.com">@icloud.com</option>
-                    <!-- Add more email providers as needed -->
+                    <!-- 添加更多電子郵件提供商選項 -->
                 </select>
+                <!-- 隱藏的 memMail 字段，綁定到後端的字段 -->
+                <input type="hidden" th:field="*{memMail}" id="memMail" />
             </div>
+        </div>
+
+
+        <!--        <div class="input-box">-->
+<!--            <label>信箱:<b>*</b></label>-->
+<!--            <div class="email-input-container">-->
+<!--                <input type="text" placeholder="請輸入信箱帳號" th:field="*{memMail}" />-->
+<!--                <select th:field="*{memMail}" class="email-provider-select">-->
+<!--                    <option value="@gmail.com">@gmail.com</option>-->
+<!--                    <option value="@yahoo.com">@yahoo.com</option>-->
+<!--                    <option value="@outlook.com">@outlook.com</option>-->
+<!--                    <option value="@icloud.com">@icloud.com</option>-->
+<!--                    &lt;!&ndash; Add more email providers as needed &ndash;&gt;-->
+<!--                </select>-->
+<!--            </div>-->
             <span th:if="${#fields.hasErrors('memMail')}" th:errors="*{memMail}" class="error" id="email.errors"></span>
         </div>
 
@@ -157,7 +185,7 @@
             <label>地址：<b>*</b></label>
             <div class="column">
                 <div class="select-box dropdown">
-                    <select name="county" id="county_box">
+                    <select name="country" id="county_box">
                         <option value="">選擇縣市</option>
                     </select>
                 </div>
@@ -188,8 +216,8 @@
         <label class="btn btn-info">
             <input id="upload_img" name="memPic" style="display:none;" type="file" accept="image/*">
             <!-- 隱藏的輸入字段，用於儲存裁剪後的圖片數據，施工中 -->
-            <input type="text" name="croppedImage" id="croppedImage" value="" th:field="*{memPic}">
-            <span th:if="${#fields.hasErrors('memPic')}" th:errors="*{memPic}" class="error"></span>
+            <input type="text" name="chaPic" id="croppedImage" value="" th:field="*{memPic}">
+<!--            <span th:if="${#fields.hasErrors('memPic')}" th:errors="*{memPic}" class="error"></span>-->
             <i class="fa fa-photo"></i> 上傳圖片
         </label>
 
@@ -243,7 +271,6 @@
 <script th:src="@{/js/backend/rentapp/addRentApp.js}"></script>
 <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
 <script th:src="@{/js/backend/member/croppie-2.6.5.js}"></script>
-
 <script>
     (function ($) {
         var width_crop = 300, // 圖片裁切寬度 px 值
@@ -371,6 +398,24 @@
                 document.getElementById('provider-hidden').value = provider;
             });
         });
+</script>
+<script>
+    // 添加事件監聽器
+    document.getElementById('localPart').addEventListener('input', updateEmail);
+    document.getElementById('domainPart').addEventListener('change', updateEmail);
+
+    // 更新 memMail 字段值的函數
+    function updateEmail() {
+        // 獲取本地部分和域名部分的值
+        const localPart = document.getElementById('localPart').value;
+        const domainPart = document.getElementById('domainPart').value;
+
+        // 組合成完整的電子郵件地址
+        const fullEmail = localPart + domainPart;
+
+        // 更新隱藏的 memMail 字段的值
+        document.getElementById('memMail').value = fullEmail;
+    }
 </script>
 
 </body>

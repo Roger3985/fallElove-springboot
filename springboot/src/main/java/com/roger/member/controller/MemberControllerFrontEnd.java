@@ -5,8 +5,10 @@ import com.roger.member.entity.uniqueAnnotation.Create;
 import com.roger.member.service.MemberService;
 import com.roger.notice.entity.Notice;
 import com.roger.notice.service.NoticeService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -24,11 +26,16 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.io.IOException;
+import java.sql.Date;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Controller
 @RequestMapping("/frontend/member")
 public class MemberControllerFrontEnd {
@@ -68,8 +75,17 @@ public class MemberControllerFrontEnd {
      */
     @GetMapping("/addMemberData")
     public String addMemberData(ModelMap modelMap) {
+
+        log.info("訪問 addMemberData 方法");
+
+        // 創建一個新的 Member 物件
         Member member = new Member();
         modelMap.addAttribute("member", member);
+
+        log.info("成功將 Member 物件添加到 ModelMap 中");
+        log.info("返回視圖名稱: frontend/member/addMember");
+
+        // 返回視圖名稱
         return "frontend/member/addMember";
     }
 
@@ -227,8 +243,11 @@ public class MemberControllerFrontEnd {
      * @return 如果登入失敗，返回登入頁面名稱；如果成功，方法返回 null 並重定向到原始請求的 URI。
      */
     @PostMapping("/loginPage")
-    public String loginPage(@ModelAttribute("mail") String memMail, @ModelAttribute("password") String memPwd,
-                            ModelMap modelMap, HttpSession session, HttpServletResponse response) {
+    public String loginPage(@ModelAttribute("mail") String memMail,
+                            @ModelAttribute("password") String memPwd,
+                            ModelMap modelMap,
+                            HttpSession session,
+                            HttpServletResponse response) {
 
         // 獲取重定向的 URI 或設置默認值
         String uri = session.getAttribute("URI") == null ? "/" : session.getAttribute("URI").toString();
@@ -307,9 +326,38 @@ public class MemberControllerFrontEnd {
         // 移除 memPic 字段中的錯誤信息
         result = removeFieldError(member, result, "memPic");
 
-        // 如果驗證結果有誤，則保留原始地址並返回前端驗證頁面
+        // 如果驗證失敗，處理錯誤
         if (result.hasErrors()) {
-            member.setMemAdd(detailAdd);
+            // 定義兩個列表來儲存空白錯誤和格式錯誤
+            List<FieldError> blankErrors = new ArrayList<>();
+            List<FieldError> formatErrors = new ArrayList<>();
+
+            // 遍歷所有的錯誤，區分空白錯誤和格式錯誤
+            for (FieldError fieldError : result.getFieldErrors()) {
+                String errorCode = fieldError.getCode();
+                // 根據錯誤程式碼區分錯誤類型
+                if ("NotBlank".equals(errorCode) || "NotNull".equals(errorCode)) {
+                    // 將空白錯誤添加到列表中
+                    blankErrors.add(fieldError);
+                } else if ("Pattern".trim().equals(errorCode)) {
+                    // 將格式錯誤添加到列表中
+                    formatErrors.add(fieldError);
+                }
+            }
+
+            if (result.hasErrors()) {
+                // 將空白的錯誤消息添加到 ModelMap 中
+                modelMap.addAttribute("blankErrors", blankErrors);
+
+                // 將格式錯誤的錯誤消息添加到 ModelMap 中
+                modelMap.addAttribute("formatErrors", formatErrors);
+
+                // 將會員的之前輸入的資料也添加到 ModelMap 中，以便在提交表單後重新呈現時保留資料
+                modelMap.addAttribute("member", member);
+
+                // 返回註冊表單頁面
+                return "frontend/member/addMember";
+            }
         }
 
         // 註冊會員並將會員資料存入會話

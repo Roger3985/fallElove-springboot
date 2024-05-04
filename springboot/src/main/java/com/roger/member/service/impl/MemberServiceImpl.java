@@ -11,7 +11,9 @@ import org.springframework.stereotype.Service;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.sql.Date;
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
@@ -49,6 +51,8 @@ public class MemberServiceImpl implements MemberService {
         // 將會員的密碼進行加密
         String encryptedPassword = hashPassword(member.getMemPwd());
         member.setMemPwd(encryptedPassword);
+
+        member.setMemBd(member.getMemBd());
 
         // 設定會員加入時間
         member.setMemberJoinTime(new Timestamp(System.currentTimeMillis()));
