@@ -142,7 +142,7 @@ public class ReportControllerBackEnd {
         // 更新回覆檢舉
         reportService.edit(report);
 
-        // 更新 Redis 存儲
+        // 更新 Redis 儲存
         redisTemplate.opsForValue().set("noType:reports" + reportNo, reportNo);
 
         // 重定向到回覆檢舉列表頁面

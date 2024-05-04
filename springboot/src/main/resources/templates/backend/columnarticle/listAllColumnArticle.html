@@ -57,34 +57,34 @@
                                             <span th:if="${columnarticle.artStat == 0}" th:text="下架"></span>
                                             <span th:if="${columnarticle.artStat == 1}" th:text="上架"></span>
                                         </td>
-<!--                                        <td>-->
-<!--                                            <form method="post" th:action="@{banMember}">-->
-<!--                                                <input type="hidden" name="memNo" th:value="${member.memNo}">-->
-<!--                                                <input type="submit" value="停權" th:if="${member.memStat != 2}" style="background-color: #3498db; /* 藍色背景顏色 */-->
-<!--                                                        color: #fff; /* 白色文字顏色 */-->
-<!--                                                        border: none; /* 去掉邊框 */-->
-<!--                                                        padding: 10px 10px; /* 內邊距 */-->
-<!--                                                        cursor: pointer; /* 鼠標懸停效果 */-->
-<!--                                                        border-radius: 10px;-->
-<!--                                                        font-weight: bold;-->
-<!--                                                        font-size: 14px;"-->
-<!--                                                       onmouseover="this.style.color='red'; this.style.backgroundColor='yellow'"-->
-<!--                                                       onmouseout="this.style.color='white'; this.style.backgroundColor='#3498db'">-->
-<!--                                            </form>-->
-<!--                                            <form method="post" th:action="@{reMember}">-->
-<!--                                                <input type="hidden" name="memNo" th:value="${member.memNo}">-->
-<!--                                                <input type="submit" value="復權" th:unless="${member.memStat != 2}" style="background-color: green; /* 藍色背景顏色 */-->
-<!--                                                        color: #fff; /* 白色文字顏色 */-->
-<!--                                                        border: none; /* 去掉邊框 */-->
-<!--                                                        padding: 10px 10px; /* 內邊距 */-->
-<!--                                                        cursor: pointer; /* 鼠標懸停效果 */-->
-<!--                                                        border-radius: 10px;-->
-<!--                                                        font-weight: bold;-->
-<!--                                                        font-size: 14px;"-->
-<!--                                                       onmouseover="this.style.color='red'; this.style.backgroundColor='yellow'"-->
-<!--                                                       onmouseout="this.style.color='white'; this.style.backgroundColor='green'">-->
-<!--                                            </form>-->
-<!--                                        </td>-->
+                                        <td>
+                                            <form method="post" th:action="@{updateColumnArticleStat}">
+                                                <input type="hidden" name="memNo" th:value="${columnarticle.artNo}">
+                                                <input type="submit" value="下架" th:if="${columnarticle.artStat != 1}" style="background-color: #3498db; /* 藍色背景顏色 */
+                                                        color: #fff; /* 白色文字顏色 */
+                                                        border: none; /* 去掉邊框 */
+                                                        padding: 10px 10px; /* 內邊距 */
+                                                        cursor: pointer; /* 鼠標懸停效果 */
+                                                        border-radius: 10px;
+                                                        font-weight: bold;
+                                                        font-size: 14px;"
+                                                       onmouseover="this.style.color='red'; this.style.backgroundColor='yellow'"
+                                                       onmouseout="this.style.color='white'; this.style.backgroundColor='#3498db'">
+                                            </form>
+                                            <form method="post" th:action="@{updateColumnArticleStat}">
+                                                <input type="hidden" name="memNo" th:value="${columnarticle.artNo}">
+                                                <input type="submit" value="復權" th:unless="${columnarticle.artStat != 1}" style="background-color: green; /* 藍色背景顏色 */
+                                                        color: #fff; /* 白色文字顏色 */
+                                                        border: none; /* 去掉邊框 */
+                                                        padding: 10px 10px; /* 內邊距 */
+                                                        cursor: pointer; /* 鼠標懸停效果 */
+                                                        border-radius: 10px;
+                                                        font-weight: bold;
+                                                        font-size: 14px;"
+                                                       onmouseover="this.style.color='red'; this.style.backgroundColor='yellow'"
+                                                       onmouseout="this.style.color='white'; this.style.backgroundColor='green'">
+                                            </form>
+                                        </td>
                                     </tr>
                                 </th:block>
                                 </tbody>

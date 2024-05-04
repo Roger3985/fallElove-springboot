@@ -22,4 +22,24 @@ public interface ColumnArticleService {
      * @return `Optional<ColumnArticle>` 包含找到的 `ColumnArticle` 物件，或 `Optional.empty()` 表示找不到。
      */
     public ColumnArticle getOneColumnArticle(Integer artNo);
+
+    /**
+     * 更新專欄文章的資料。
+     * 該方法接受一個新的專欄文章物件 'newData'，並接受該物件的資料更新現有的專欄文章。
+     * 此方法返回更新的的專欄文章物件。
+     *
+     * @param newData 新的專欄文章物件，包含要更新的物件。
+     * @return 更新後的專欄文章物件
+     */
+    public ColumnArticle edit(ColumnArticle newData);
+
+    /**
+     * 根據文章編號查找專欄文章。
+     * 該方法接受一個文章編號作為參數，並返回與該文章編號相關的專欄文章物件。
+     *
+     * @param artNo 文章編號。
+     * @return 專欄文章物件，如果找不到則返回 'null'。
+     */
+    public ColumnArticle findColumnArticleByArtNo(Integer artNo);
+
 }

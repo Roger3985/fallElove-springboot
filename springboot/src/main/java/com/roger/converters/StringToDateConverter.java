@@ -1,4 +1,4 @@
-package com.roger.member.converters;
+package com.roger.converters;
 
 import org.springframework.core.convert.converter.Converter;
 
@@ -25,4 +25,5 @@ public class StringToDateConverter implements Converter<String, Date> {
             return null;
         }
     }
+
 }

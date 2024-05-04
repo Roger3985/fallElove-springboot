@@ -3,18 +3,22 @@ package com.roger.columnarticle.controller;
 import com.ren.administrator.entity.Administrator;
 import com.roger.columnarticle.entity.ColumnArticle;
 import com.roger.columnarticle.service.ColumnArticleService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.servlet.http.HttpSession;
 import java.util.List;
 
+@Slf4j
 @Controller
 @RequestMapping("/backend/columnarticle")
 public class ColumnArticleControllerBackEnd {
@@ -83,8 +87,62 @@ public class ColumnArticleControllerBackEnd {
 
     }
 
+    /**
+     * 更新專欄文章的狀態（上下架）。
+     * 該方法根據前端傳入的專欄文章編號（`artNo`）查找相關的專欄文章，
+     * 然後根據該專欄文章的狀態（`artStat`）切換其上下架狀態。
+     * 如果當前狀態為上架（`artStat = 0`），則設置為下架（`artStat = 1`），並將文章編號存儲到 Redis 中。
+     * 如果當前狀態為下架（`artStat = 1`），則設置為上架（`artStat = 0`），並從 Redis 中刪除相關鍵。
+     * 最後，重定向到專欄文章列表頁面。
+     *
+     * @param artNo 前端傳入的專欄文章編號。
+     * @return 重定向到專欄文章列表頁面的 URL。
+     */
+    @Transactional
+    @PostMapping("/updateColumnArticleStat")
+    public String updateColumnArticleStat(@ModelAttribute("artNo") String artNo) {
 
+        Integer articleNumber;
+        try {
+            articleNumber = Integer.valueOf(artNo);
+        } catch (NumberFormatException e) {
+            // 使用紀錄錯誤日誌
+            log.error("專欄文章編號格式有誤:{}", artNo, e);
+//            return "redirect:/backend/columnarticle/listAllColumnArticle";
+        }
 
+        // 查找與文章編號相關的專欄文章
+        ColumnArticle columnArticle = columnArticleService.findColumnArticleByArtNo(Integer.valueOf(artNo));
+        if (columnArticle == null) {
+            // 使用 log 紀錄錯誤日誌
+            log.error("找不到專欄文章:{}", artNo);
+            return "redirect:/backend/columnarticle/listAllColumnArticle";
+        }
 
+        String redisKey = "noFun:columnarticles" + artNo;
 
+        if (columnArticle.getArtStat().equals(Byte.valueOf("0"))) {
+
+            // 將文章編號的文章狀態設置為下架(上架->下架)
+            columnArticle.setArtStat(Byte.valueOf("1"));
+
+            // 更新 Redis 儲存
+            redisTemplate.opsForValue().set("noFun:columnarticles" + artNo, artNo);
+
+        } else if (columnArticle.getArtStat().equals(Byte.valueOf("1"))) {
+
+            // 將文章編號的文章狀態設置為上架(下架->上架)
+            columnArticle.setArtStat(Byte.valueOf("0"));
+
+            // 檢查 Redis 中的鍵是否存在，如果存在則刪除
+            redisTemplate.delete("noFun:columnarticles" + artNo);
+
+        }
+
+        // 更新文章編號
+        columnArticleService.edit(columnArticle);
+
+        // 重定向到專欄文章列表頁面
+        return "redirect:/backend/columnarticle/listAllColumnArticle";
+    }
 }
