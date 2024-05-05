@@ -18,10 +18,10 @@ public interface NoticeService {
 
     /**
      * 更新現有的通知。
-     * 該方法根據傳入的 Notice 實例更新現有的通知。在更新過程中，該方法將更改現有通知的屬性以匹配傳入的 notice。
+     * 該方法根據傳入的 Notice 物件更新現有的通知。在更新過程中，該方法將更改現有通知的屬性以匹配傳入的 notice。
      *
-     * @param notice 要更新的 Notice 實例，包含要更新的通知的相關信息。
-     * @return 更新後的 Notice 實例，反映了所做的更改。
+     * @param notice 要更新的 Notice 物件，包含要更新的通知的相關信息。
+     * @return 更新後的 Notice 物件，反映了所做的更改。
      */
     public Notice updateNotice(Notice notice);
 

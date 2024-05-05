@@ -1,10 +1,103 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>專欄文章修改頁面</title>
+<!--    <th:block th:include="~{backend/component/plugin/backendplugin.html :: css}"></th:block>-->
+<!--    &lt;!&ndash; Custom styles for this page &ndash;&gt;-->
+<!--    <link th:href="@{/backend/vendor/datatables/dataTables.bootstrap4.min.css}" rel="stylesheet"/>-->
 </head>
-<body>
+<body id="page-top">
+<!--&lt;!&ndash; Page Wrapper &ndash;&gt;-->
+<!--<div id="wrapper">-->
+<!--    &lt;!&ndash; Sidebar &ndash;&gt;-->
+<!--    <ul th:replace="backend/component/sidebar :: sidebar"></ul>-->
+<!--    &lt;!&ndash; End of Sidebar &ndash;&gt;-->
+<!--    &lt;!&ndash; Content Wrapper &ndash;&gt;-->
+<!--    <div id="content-wrapper" class="d-flex flex-column">-->
+<!--        &lt;!&ndash; Main Content &ndash;&gt;-->
+<!--        <div id="content">-->
+<!--            &lt;!&ndash; Topbar &ndash;&gt;-->
+<!--            <nav th:replace="backend/component/nav :: nav"></nav>-->
+<!--            &lt;!&ndash; End of Topbar &ndash;&gt;-->
+<!--            &lt;!&ndash; Begin Page Content &ndash;&gt;-->
+<!--            <div class="container-fluid">-->
+<!--                <div th:replace="backend/component/breadcrumb :: breadcrumb"></div>-->
+<!--                &lt;!&ndash; 內容請填這裡~~~~~~~~~~~~~~~ &ndash;&gt;-->
+<!--                &lt;!&ndash; DataTales Example &ndash;&gt;-->
+<!--                <div class="card shadow mb-4">-->
+<!--                    <div class="card-header py-3">-->
+<!--                        <h6 class="m-0 font-weight-bold text-primary">單個專欄文章資料:</h6>-->
+<!--                    </div>-->
+<!--                    <div class="card-body">-->
+<!--                        <div class="table-responsive">-->
+                            <form method="post" th:action="@{updateColumnArticle}" th:object="${data}" enctype="multipart/form-data">
+                                <table>
+                                    <tr>
+                                        <td><label for="artNo">文章編號編號：<b>*</b></label></td>
+                                        <td><input id="artNo" title="文章編號編號" th:field="*{artNo}" readonly></td>
+                                        <td><span  th:if="${#fields.hasErrors('artNo')}" th:errors="*{artNo}" class="error" id="artNo.errors"></span></td>
+                                    </tr>
+                                    <tr>
+                                        <td><label for="admNo">管理員編號：<b>*</b></label></td>
+                                        <td><input id="admNo" th:field="*{administrator.admNo}" title="請輸入編號"></td>
+                                        <td><span  th:if="${#fields.hasErrors('admNo')}" th:errors="*{administrator.admNo}" class="error" id="administrator.admNo.errors"></span></td>
+                                    </tr>
+                                    <tr>
+                                        <td><label for="artTitle">文章標題</label></td>
+                                        <td><input id="artTitle" title="文章標題" th:field="*{artTitle}" ></td>
+                                        <td><span  th:if="${#fields.hasErrors('artTitle')}" th:errors="*{artTitle}" class="error" id="notContent.errors"></span></td>
+                                    </tr>
+                                    <tr>
+                                        <td><label for="artContent">文章內容:</label></td>
+                                        <td><input id="artContent" title="文章內容" th:field="*{artContent}" ></td>
+                                        <td><span  th:if="${#fields.hasErrors('artContent')}" th:errors="*{artContent}" class="error" id="artContent.errors"></span></td>
+                                    </tr>
+                                    <tr>
+                                        <td><label for="artTime">文章發表時間：</label></td>
+                                        <td><input type="datetime-local" id="artTime" th:field="*{artTime}"></td>
+                                        <td><span  th:if="${#fields.hasErrors('artTime')}" th:errors="*{artTime}" class="error" id="artTime.errors"></span></td>
+                                    </tr>
+                                    <tr>
+                                        <td><label for="artCatNo">文章分類編號:</label></td>
+                                        <td><input id="artCatNo" title="文章分類編號" th:field="*{artCatNo}" ></td>
+                                        <td><span  th:if="${#fields.hasErrors('artCatNo')}" th:errors="*{artCatNo}" class="error" id="artCatNo.errors"></span></td>
+                                    </tr>
+                                    <tr>
+                                        <td><label for="artStat">文章狀態：</label></td>
+                                        <td><input id="artStat" title="文章狀態" th:field="*{artStat}" ></td>
+                                        <td><span  th:if="${#fields.hasErrors('artStat')}" th:errors="*{artStat}" class="error" id="artStat.errors"></span></td>
+                                    </tr>
+                                </table>
+                                <input type="submit" class="submit" value="修改資料">
+                            </form>
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+            <!-- /.container-fluid -->
+<!--        </div>-->
+        <!-- End of Main Content -->
 
+        <!-- Footer -->
+<!--        <footer th:replace="backend/component/bottom :: bottom"></footer>-->
+<!--        &lt;!&ndash; End of Footer &ndash;&gt;-->
+<!--    </div>-->
+<!--    &lt;!&ndash; End of Content Wrapper &ndash;&gt;-->
+<!--</div>-->
+<!--&lt;!&ndash; End of Page Wrapper &ndash;&gt;-->
+
+<!--&lt;!&ndash; Scroll to Top Button&ndash;&gt;-->
+<!--<a th:replace="backend/component/scrolltotop :: scrolltotop"></a>-->
+<!--&lt;!&ndash; Logout Modal&ndash;&gt;-->
+<!--<div th:replace="backend/component/logout :: logout"></div>-->
+
+<!--<th:block th:insert="~{backend/component/plugin/backendplugin.html :: js}"></th:block>-->
+<!--&lt;!&ndash; Page level plugins &ndash;&gt;-->
+<!--<script th:src="@{/backend/vendor/datatables/jquery.dataTables.min.js}"></script>-->
+<!--<script th:src="@{/backend/vendor/datatables/dataTables.bootstrap4.min.js}"></script>-->
+<!--&lt;!&ndash; Page level custom scripts &ndash;&gt;-->
+<!--<script th:src="@{/backend/js/demo/datatables-demo.js}"></script>-->
 </body>
 </html>

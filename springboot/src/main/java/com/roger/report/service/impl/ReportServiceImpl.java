@@ -42,6 +42,15 @@ public class ReportServiceImpl implements ReportService {
     }
 
     /**
+     * 查找所有回覆檢舉（Report）物件。
+     */
+    @Override
+    public List<Report> findAll() {
+        return reportRepository.findAll();
+    }
+
+
+    /**
      * 根據會員編號查找與該會員相關的回覆檢舉報告。
     */
     @Override

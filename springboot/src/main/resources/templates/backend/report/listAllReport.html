@@ -41,6 +41,8 @@
                                     <th>檢舉時間</th>
                                     <th>檢舉原因</th>
                                     <th>審核狀態</th>
+
+                                    <th>狀態修改</th>
                                 </thead>
                                 <tbody>
                                     <th:block th:each="report : ${reportListData}">
@@ -51,46 +53,51 @@
                                             <td th:text="${report.administrator.admNo}"></td>
                                             <td th:text="${report.reportTime}"></td>
                                             <td th:text="${report.reportReason}"></td>
-
-                    <!--                        <td>-->
-                    <!--                            <form id='myForm' th:action="@{update}" method="post" enctype="multipart/form-data">-->
-                    <!--                                <input type="hidden" th:value="${report.reportNo}" name="reportNo">-->
-                    <!--                                <input type="hidden" th:value="${report.reportReason}" name="reportCon">-->
-                    <!--                                <input type="hidden" th:value="${report.reportType}" name="reportSt">-->
-                    <!--                                <div th:switch="${report.reportType}">-->
-                    <!--                                    <th:block th:case="0">-->
-                    <!--                                        <button type="button" style="background-color: #5bc0de; /* 藍色背景顏色 */-->
-                    <!--                                                        color: #fff; /* 白色文字顏色 */-->
-                    <!--                                                        border: none; /* 去掉邊框 */-->
-                    <!--                                                        padding: 10px 10px; /* 內邊距 */-->
-                    <!--                                                        cursor: pointer; /* 鼠標懸停效果 */-->
-                    <!--                                                        border-radius: 10px;-->
-                    <!--                                                        font-weight: bold;-->
-                    <!--                                                        font-size: 14px;-->
-                    <!--                                                        box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);"-->
-                    <!--                                                onmouseover="this.style.color='red'; this.style.backgroundColor='yellow'"-->
-                    <!--                                                onmouseout="this.style.color='white'; this.style.backgroundColor='#5bc0de'"-->
-                    <!--                                                onclick="setDataValue(this,'1')"> 待處理 </button>-->
-                    <!--                                        <button type="button" style="background-color: #5bc0de; /* 藍色背景顏色 */-->
-                    <!--                                                        color: #fff; /* 白色文字顏色 */-->
-                    <!--                                                        border: none; /* 去掉邊框 */-->
-                    <!--                                                        padding: 10px 10px; /* 內邊距 */-->
-                    <!--                                                        cursor: pointer; /* 鼠標懸停效果 */-->
-                    <!--                                                        border-radius: 10px;-->
-                    <!--                                                        font-weight: bold;-->
-                    <!--                                                        font-size: 14px;-->
-                    <!--                                                        box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);"-->
-                    <!--                                                onmouseover="this.style.color='red'; this.style.backgroundColor='yellow'"-->
-                    <!--                                                onmouseout="this.style.color='white'; this.style.backgroundColor='#5bc0de'"-->
-                    <!--                                                onclick="setDataValue(this, '2')">已處理</button>-->
-                    <!--                                    </th:block>-->
-                    <!--                                </div>-->
-                    <!--                            </form>-->
-                    <!--                        </td>-->
                                             <td>
-                                                <form method="post" th:action="@{noTypeReport}">
+                                                <span th:if="${report.reportType == 0}" th:text="待處理"></span>
+                                                <span th:if="${report.reportType == 1}" th:text="已處理"></span>
+                                            </td>
+
+<!--                                            <td>-->
+<!--                                                <form id='myForm' th:action="@{updateReport}" method="post" enctype="multipart/form-data">-->
+<!--                                                    <input type="hidden" th:value="${report.reportNo}" name="reportNo">-->
+<!--                                                    <input type="hidden" th:value="${report.reportReason}" name="reportCon">-->
+<!--                                                    <input type="hidden" th:value="${report.reportType}" name="reportSt">-->
+<!--                                                    <div th:switch="${report.reportType}">-->
+<!--                                                        <th:block th:case="0">-->
+<!--                                                            <button type="button" style="background-color: #5bc0de; /* 藍色背景顏色 */-->
+<!--                                                                            color: #fff; /* 白色文字顏色 */-->
+<!--                                                                            border: none; /* 去掉邊框 */-->
+<!--                                                                            padding: 10px 10px; /* 內邊距 */-->
+<!--                                                                            cursor: pointer; /* 鼠標懸停效果 */-->
+<!--                                                                            border-radius: 10px;-->
+<!--                                                                            font-weight: bold;-->
+<!--                                                                            font-size: 14px;-->
+<!--                                                                            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);"-->
+<!--                                                                    onmouseover="this.style.color='red'; this.style.backgroundColor='yellow'"-->
+<!--                                                                    onmouseout="this.style.color='white'; this.style.backgroundColor='#5bc0de'"-->
+<!--                                                                    onclick="setDataValue(this,'1')"> 待處理 </button>-->
+<!--                                                            <button type="button" style="background-color: #5bc0de; /* 藍色背景顏色 */-->
+<!--                                                                            color: #fff; /* 白色文字顏色 */-->
+<!--                                                                            border: none; /* 去掉邊框 */-->
+<!--                                                                            padding: 10px 10px; /* 內邊距 */-->
+<!--                                                                            cursor: pointer; /* 鼠標懸停效果 */-->
+<!--                                                                            border-radius: 10px;-->
+<!--                                                                            font-weight: bold;-->
+<!--                                                                            font-size: 14px;-->
+<!--                                                                            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);"-->
+<!--                                                                    onmouseover="this.style.color='red'; this.style.backgroundColor='yellow'"-->
+<!--                                                                    onmouseout="this.style.color='white'; this.style.backgroundColor='#5bc0de'"-->
+<!--                                                                    onclick="setDataValue(this, '2')">已處理</button>-->
+<!--                                                        </th:block>-->
+<!--                                                    </div>-->
+<!--                                                </form>-->
+<!--                                            </td>-->
+                                            <td>
+                                                <form method="post" th:action="@{reNoTypeReport}">
                                                     <input type="hidden" name="reportNo" th:value="${report.reportNo}">
-                                                    <input type="submit" value="未處理" th:if="${report.reportType != 1}" style="background-color: #3498db; /* 藍色背景顏色 */
+                                                    <!-- 只有在 report.reportType 不等於 1 時，這裡的內容才會被渲染 -->
+                                                    <input type="submit" value="已處理" th:if="${report.reportType != 1}" style="background-color: #3498db; /* 藍色背景顏色 */
                                                                             color: #fff; /* 白色文字顏色 */
                                                                             border: none; /* 去掉邊框 */
                                                                             padding: 10px 10px; /* 內邊距 */
@@ -101,9 +108,10 @@
                                                            onmouseover="this.style.color='red'; this.style.backgroundColor='yellow'"
                                                            onmouseout="this.style.color='white'; this.style.backgroundColor='#3498db'">
                                                 </form>
-                                                <form method="post" th:action="@{reNoTypeReport}">
+                                                <form method="post" th:action="@{noTypeReport}">
                                                     <input type="hidden" name="reportNo" th:value="${report.reportNo}">
-                                                    <input type="submit" value="已處理" th:unless="${report.reportType != 1}" style="background-color: green; /* 藍色背景顏色 */
+                                                    <!-- 只有在 report.reportType 等於 1 時，這裡的內容才會被渲染 -->
+                                                    <input type="submit" value="未處理" th:unless="${report.reportType != 1}" style="background-color: green; /* 藍色背景顏色 */
                                                                             color: #fff; /* 白色文字顏色 */
                                                                             border: none; /* 去掉邊框 */
                                                                             padding: 10px 10px; /* 內邊距 */

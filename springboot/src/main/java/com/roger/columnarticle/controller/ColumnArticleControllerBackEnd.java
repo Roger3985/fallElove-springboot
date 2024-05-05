@@ -10,12 +10,13 @@ import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
+import java.io.IOException;
 import java.util.List;
 
 @Slf4j
@@ -38,7 +39,7 @@ public class ColumnArticleControllerBackEnd {
      */
     @GetMapping("/listAllColumnArticle")
     public String listAllColumnArticle(Model model) {
-        return "/backend/columnarticle/listAllColumnArticle";
+        return "backend/columnarticle/listAllColumnArticle";
     }
 
     /**
@@ -67,24 +68,77 @@ public class ColumnArticleControllerBackEnd {
     @GetMapping("/updateColumnArticleData")
     public String updateColumnArticleData(ModelMap modelMap,
                                           HttpSession session,
-                                          @ModelAttribute("artNo") String artNo) {
+                                          @RequestParam("artNo") String artNo) {
 
         // 從會話中獲取當前登錄的管理員
-        Administrator myData = (Administrator) session.getAttribute("ValidAdministrator");
-
-        if (myData == null) {
-            // 未登錄管理員帳號，重定向到管理員的頁面
-            return "redirect:/backend/administrator/loginAdministrator";
-        }
+        // TODO 因為現在管理員頁面還沒做出來，所以先進行註解，之後需要再打開
+//        Administrator currentAdmin = (Administrator) session.getAttribute("ValidAdministrator");
+//        if (currentAdmin == null) {
+//            // 未登錄管理員帳號，重定向到管理員的頁面
+//            return "redirect:/backend/administrator/loginAdministrator";
+//        }
 
         System.out.println(artNo);
-        ColumnArticle oldData = columnArticleService.getOneColumnArticle(Integer.valueOf(artNo));
-        System.out.println("test" + oldData);
+        // 使用 artNo 查找對應的專欄文章
+        ColumnArticle oldColumnArticle = columnArticleService.getOneColumnArticle(Integer.valueOf(artNo));
+        System.out.println("test" + oldColumnArticle);
 
-        modelMap.addAttribute("data", oldData);
+        // 檢查文章是否存在
+//        if (oldColumnArticle == null) {
+//            // 如果專欄文章不存在，則可以根據需要返回的錯誤頁面或進行其他的處理
+//            modelMap.addAttribute("error", "找不到指定的文章。");
+//            // TODO 尚未製作
+//            return "backend/columnarticle/error";
+//        }
+
+        modelMap.addAttribute("data", oldColumnArticle);
 
         return "backend/columnarticle/updateColumnArticle";
 
+    }
+
+    /**
+     * 更新專欄文章。
+     *
+     * @param columnArticle 專欄文章資料。
+     * @param result 用來檢查表單資料的驗證結果。
+     * @param modelMap 用來傳遞資料到視圖。
+     * @param session 用來儲存會話狀態的會話物件。
+     * @return 更新成功後的重定向路徑。
+     * @throws IOException 如果發生 IO 錯誤。
+     */
+    @Transactional
+    @PostMapping("/updateColumnArticle")
+    public String updateColumnArticle(@ModelAttribute("data") @Valid ColumnArticle columnArticle,
+                                      BindingResult result,
+                                      ModelMap modelMap,
+                                      HttpSession session) throws IOException {
+
+        // FIXME 以下兩行非必要，因為在前往修改頁面的時候就已經擋掉沒有登入管理員
+//        // 獲取當前會話中管理員設置的舊專欄文章資料
+//        Administrator currentAdmin = (Administrator) session.getAttribute("ValidAdministrator");
+//        // 設置管理專欄文章的管理員為當前登錄的管理員
+//        columnArticle.setAdministrator(currentAdmin);
+
+        if (result.hasErrors()) {
+            // 紀錄驗證錯誤日誌
+            log.error("驗證錯誤：{}", result.getAllErrors());
+            // 將錯誤資訊和管理員提交資料添加到 modelMap 中，以便在視圖中顯示
+            modelMap.addAttribute("errors", result.getAllErrors());
+            modelMap.addAttribute("data", columnArticle);
+            // 回到更新專欄文章的頁面
+            return "backend/columnarticle/updateColumnArticle";
+        }
+
+        // 更新專欄文章
+        ColumnArticle updateColumnArticle = columnArticleService.updateColumnArticle(columnArticle);
+
+        // 將更新後的專欄文章資料添加到 modelMap 中，鍵為 "successData"
+        // 這樣就可以將更新後的專欄文章資料傳遞到視圖層
+        modelMap.addAttribute("successData", updateColumnArticle);
+
+        // 如果更新成功，重定向到全部的專欄文章頁面
+        return "redirect:/backend/columnarticle/listAllColumnArticle";
     }
 
     /**
@@ -102,7 +156,10 @@ public class ColumnArticleControllerBackEnd {
     @PostMapping("/updateColumnArticleStat")
     public String updateColumnArticleStat(@ModelAttribute("artNo") String artNo) {
 
-        Integer articleNumber;
+        System.out.println(artNo);
+
+        Integer articleNumber = null;
+
         try {
             articleNumber = Integer.valueOf(artNo);
         } catch (NumberFormatException e) {
@@ -139,7 +196,7 @@ public class ColumnArticleControllerBackEnd {
 
         }
 
-        // 更新文章編號
+        // 更新專欄文章
         columnArticleService.edit(columnArticle);
 
         // 重定向到專欄文章列表頁面

@@ -116,11 +116,11 @@
             <h3>性別：<b>*</b></h3>
             <div class="gender-option">
                 <div class="gender">
-                    <input type="radio" id="check-male"  th:field="*{memGender}" th:value="0"/>
+                    <input type="radio" id="check-male"  th:field="*{memGender}" th:value="1"/>
                     <label for="check-male">男性</label>
                 </div>
                 <div class="gender">
-                    <input type="radio" id="check-female"  th:field="*{memGender}" th:value="1"/>
+                    <input type="radio" id="check-female"  th:field="*{memGender}" th:value="2"/>
                     <label for="check-female">女性</label>
                 </div>
             </div>
@@ -198,6 +198,12 @@
             <input type="date" placeholder="請輸入生日" th:field="*{memBd}" />
             <span th:if="${#fields.hasErrors('memBd')}" th:errors="*{memBd}" class="error"></span>
         </div>
+
+<!--        <div class="input-box">-->
+<!--            <label>加入時間:<b>*</b></label>-->
+<!--            <input type="datetime-local" placeholder="請輸入加入時間" th:field="*{memberJoinTime}" />-->
+<!--            <span th:if="${#fields.hasErrors('memberJoinTime')}" th:errors="*{memberJoinTime}" class="error"></span>-->
+<!--        </div>-->
 
         <div class="input-box">
             <label>信用卡號(非必填):<b></b></label>

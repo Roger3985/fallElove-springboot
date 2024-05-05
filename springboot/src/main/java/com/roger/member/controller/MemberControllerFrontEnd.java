@@ -27,6 +27,8 @@ import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.sql.Date;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -39,12 +41,6 @@ import java.util.stream.Collectors;
 @Controller
 @RequestMapping("/frontend/member")
 public class MemberControllerFrontEnd {
-
-    // 前往後台管理首頁
-    @GetMapping("/frontendEndIndex")
-    public String frontendEndIndex() {
-        return "frontend/index";
-    }
 
     /**
      * MemberService 的自動裝配成員變數，用於處理會員相關的服務。
@@ -63,6 +59,7 @@ public class MemberControllerFrontEnd {
      */
     @Autowired
     private StringRedisTemplate redisTemplate;
+
 
     /**
      * 前往註冊會員頁面。
@@ -325,6 +322,11 @@ public class MemberControllerFrontEnd {
 
         // 移除 memPic 字段中的錯誤信息
         result = removeFieldError(member, result, "memPic");
+
+        // 設定會員加入時間
+        if (member.getMemberJoinTime() == null) {
+            member.setMemberJoinTime(new Timestamp(System.currentTimeMillis()));
+        }
 
         // 如果驗證失敗，處理錯誤
         if (result.hasErrors()) {

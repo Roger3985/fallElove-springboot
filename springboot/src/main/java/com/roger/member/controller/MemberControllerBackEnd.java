@@ -2,6 +2,7 @@ package com.roger.member.controller;
 
 import com.roger.member.entity.Member;
 import com.roger.member.service.MemberService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Controller;
@@ -11,9 +12,11 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.List;
 
+@Slf4j
 @Controller
 @RequestMapping("/backend/member")
 public class MemberControllerBackEnd {
@@ -23,6 +26,12 @@ public class MemberControllerBackEnd {
 
     @Autowired
     private StringRedisTemplate redisTemplate;
+
+    // 前往後台管理首頁
+    @GetMapping("/frontendEndIndex")
+    public String frontendEndIndex() {
+        return "frontend/index";
+    }
 
     /**
      * 顯示所有會員列表的頁面。
@@ -51,31 +60,40 @@ public class MemberControllerBackEnd {
     }
 
     /**
-     * 停權指定的會員帳號。
-     * 此方法通過接受會員編號(`memNo`)作為參數，並使用`memberService.banMem()`方法進行會員帳號停權處理。
-     * 此外，該方法還將會員編號存儲在Redis中，標記為"noFun"。
+     * 停權指定的會員帳號並立即登出該會員。
+     * 此方法接受會員編號 (`memNo`) 作為參數，並使用 `memberService.banMem()` 方法進行會員帳號停權處理。
+     * 停權成功後，該方法將會員編號存儲在 Redis 中，標記為 "noFun"。
+     * 此外，該方法會立即終止該會員的會話，從而強制登出該會員。
      *
      * @param memNo 要停權的會員編號。
+     * @param session HTTP 會話 (`HttpSession`) 用於終止該會員的會話。
      * @return 重定向到會員列表頁面。
      */
     @PostMapping("/banMember")
-    public String banMember(@ModelAttribute("memNo") String memNo) {
+    public String banMember(@ModelAttribute("memNo") String memNo, HttpSession session) {
+        // 停權會員
         memberService.banMem(Integer.valueOf(memNo));
         redisTemplate.opsForValue().set("noFun:members" + memNo, memNo);
+
+        // 終止該會員的會話
+        session.invalidate();
+
+        // 重定向到會員列表頁面
         return "redirect:/backend/member/memberlist";
     }
 
     /**
-     * 復權指定的會員帳號。
+     * 復權指定會員帳號並恢復會員的會話。
      * 此方法通過接受會員編號(`memNo`)作為參數，使用`memberService.findByNo()`方法查找會員對象，
      * 然後將該會員的帳號狀態設置為已驗證(狀態值為1)，並使用`memberService.edit()`方法更新會員信息。
      *
      * @param memNo 要復權的會員編號。
+     * @param session 要恢復的 HTTP 會話。
      * @return 重定向到會員列表頁面。
      */
     @PostMapping("/reMember")
-    public String reMember(@ModelAttribute("memNo") String memNo) {
-
+    public String reMember(@ModelAttribute("memNo") String memNo, HttpSession session) {
+        // 復權會員
         Member member = memberService.findByNo(Integer.valueOf(memNo));
         member.setMemStat(Byte.valueOf("1"));
         memberService.edit(member);
@@ -86,6 +104,10 @@ public class MemberControllerBackEnd {
             redisTemplate.delete(key);
         }
 
+        // 恢復會員會話
+        session.setAttribute("loginsuccess", member);
+
+        // 重定向到會員列表頁面
         return "redirect:/backend/member/memberlist";
     }
 

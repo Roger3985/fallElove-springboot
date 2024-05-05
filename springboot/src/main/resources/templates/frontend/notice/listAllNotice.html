@@ -81,7 +81,7 @@
             <th:block th:each="notice : ${noticeListData}">
     
                 <tr>
-                    <td th:text="${notice.noticeNo}"></td>
+                    <td th:text="${notice.motNo}"></td>
                     <td th:text="${notice.empNo}"></td>
                     <td th:text="${#dates.format(notice.noticeTime, 'yyyy/MM/dd HH:mm:ss')}"></td>
                     <td th:text="${notice.noticeContent}"></td>

@@ -50,7 +50,7 @@ public class ReportControllerBackEnd {
      */
     @ModelAttribute("reportListData")
     protected List<Report> referenceListData() {
-        List<Report> list = reportService.getAll();
+        List<Report> list = reportService.findAll();
         return list;
     }
 

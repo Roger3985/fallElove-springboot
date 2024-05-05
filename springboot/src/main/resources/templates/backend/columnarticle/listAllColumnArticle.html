@@ -28,7 +28,7 @@
                 <!-- DataTales Example -->
                 <div class="card shadow mb-4">
                     <div class="card-header py-3">
-                        <h6 class="m-0 font-weight-bold text-primary">全部專欄文章資料index.html:</h6>
+                        <h6 class="m-0 font-weight-bold text-primary">全部專欄文章資料</h6>
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
@@ -42,6 +42,7 @@
                                     <th>文章發表時間</th>
                                     <th>文章分類編號</th>
                                     <th>文章狀態</th>
+                                    <th>狀態修改</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -58,9 +59,18 @@
                                             <span th:if="${columnarticle.artStat == 1}" th:text="上架"></span>
                                         </td>
                                         <td>
+<!--                                            <&#45;&#45;您可以在這裡添加修改按鈕的功能 &ndash;&gt;-->
+<!--                                            <button th:onclick="'editArticleData(' + ${columnarticle.artNo} + ')'">修改</button>-->
+                                            <form method="get" th:action="@{updateColumnArticleData}">
+<!--                                                <input type="text" name="artNo" th:value="${columnarticle.artNo}" readonly>-->
+                                                <input type="text" name="artNo" th:value="${columnarticle.artNo}">
+                                                <input type="submit" value="修改" class="submit">
+                                            </form>
+                                        </td>
+                                        <td>
                                             <form method="post" th:action="@{updateColumnArticleStat}">
-                                                <input type="hidden" name="memNo" th:value="${columnarticle.artNo}">
-                                                <input type="submit" value="下架" th:if="${columnarticle.artStat != 1}" style="background-color: #3498db; /* 藍色背景顏色 */
+                                                <input type="hidden" name="artNo" th:value="${columnarticle.artNo}">
+                                                <input type="submit" value="上架" th:if="${columnarticle.artStat != 1}" style="background-color: #3498db; /* 藍色背景顏色 */
                                                         color: #fff; /* 白色文字顏色 */
                                                         border: none; /* 去掉邊框 */
                                                         padding: 10px 10px; /* 內邊距 */
@@ -72,8 +82,8 @@
                                                        onmouseout="this.style.color='white'; this.style.backgroundColor='#3498db'">
                                             </form>
                                             <form method="post" th:action="@{updateColumnArticleStat}">
-                                                <input type="hidden" name="memNo" th:value="${columnarticle.artNo}">
-                                                <input type="submit" value="復權" th:unless="${columnarticle.artStat != 1}" style="background-color: green; /* 藍色背景顏色 */
+                                                <input type="hidden" name="artNo" th:value="${columnarticle.artNo}">
+                                                <input type="submit" value="下架" th:unless="${columnarticle.artStat != 1}" style="background-color: green; /* 藍色背景顏色 */
                                                         color: #fff; /* 白色文字顏色 */
                                                         border: none; /* 去掉邊框 */
                                                         padding: 10px 10px; /* 內邊距 */

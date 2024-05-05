@@ -34,6 +34,15 @@ public interface ColumnArticleService {
     public ColumnArticle edit(ColumnArticle newData);
 
     /**
+     * 更新現有的專欄文章。
+     * 該方法根據傳入的 ColumnArticle 物件更新現有的專欄文章。在更新過程中，該方法將更改現有專欄文章的屬性以匹配傳入的 notice。
+     *
+     * @param columnArticle 要更新的 ColumnArticle 物件，包含要更新的專欄文章的相關信息。
+     * @return 更新後的 ColumnArticle 物件，反映了所做的更改。
+     */
+    public ColumnArticle updateColumnArticle(ColumnArticle columnArticle);
+
+    /**
      * 根據文章編號查找專欄文章。
      * 該方法接受一個文章編號作為參數，並返回與該文章編號相關的專欄文章物件。
      *

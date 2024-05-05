@@ -26,6 +26,13 @@ public interface ReportService {
     public Report getOneReport(Integer reportNo);
 
     /**
+     * 查找所有回覆檢舉（Report）物件。
+     *
+     * @return 回覆檢舉物件的列表。如果找不到任何匹配的回覆檢舉物件，則返回空列表。
+     */
+    public List<Report> findAll();
+
+    /**
      * 根據會員編號查找與該會員回覆檢舉相關的報告。
      * 該方法接受會員編號作為參數，並返回與該會員編號相關的 `Report` 物件。
      * 如果找不到相關的報告，則可能返回 `null`。

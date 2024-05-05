@@ -40,12 +40,21 @@ public class ColumnArticleServiceImpl implements ColumnArticleService {
         return columnArticleRepository.findColumnArticleByArtNo(artNo);
     }
 
+
     /**
      * 更新專欄文章的資料。
      */
     @Override
     public ColumnArticle edit(ColumnArticle newData) {
         return columnArticleRepository.save(newData);
+    }
+
+    /**
+     * 更新現有的專欄文章。
+     */
+    @Override
+    public ColumnArticle updateColumnArticle(ColumnArticle columnArticle) {
+        return columnArticleRepository.save(columnArticle);
     }
 
     /**

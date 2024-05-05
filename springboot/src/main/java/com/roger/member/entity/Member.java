@@ -106,7 +106,8 @@ public class Member implements java.io.Serializable {
     @Column(name = "creationtime")
     private Timestamp creationTime;
 
-    @NotNull(message = "請輸入加入時間")
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME, pattern = "yyyy-MM-dd HH:mm:ss")
+//    @NotNull(message = "請輸入加入時間")
     @Column(name = "memberjointime")
     private Timestamp memberJoinTime;
 
@@ -169,7 +170,30 @@ public class Member implements java.io.Serializable {
         this.memNo = memNo;
     }
 
-    public Member(Integer memNo, String memName, String memAcc, String memPwd, String memMob, Byte memGender, String memMail, String memAdd, Date memBd, String memCard, Byte provider, String clientID, String displayName, String accessToken, String refreshToken, Timestamp tknExpireTime, Timestamp creationTime, Timestamp memberJoinTime, Byte memStat, String memSalt, byte[] memPic) {
+    public Member(Integer memNo, String memName, String memAcc, String memPwd, String memMob, Byte memGender, String memMail, String memAdd, Date memBd, String memCard, Byte provider, String clientID, String displayName, String accessToken, String refreshToken, Timestamp tknExpireTime, Timestamp creationTime, Timestamp memberJoinTime, Byte memStat, byte[] memPic) {
+        this.memNo = memNo;
+        this.memName = memName;
+        this.memAcc = memAcc;
+        this.memPwd = memPwd;
+        this.memMob = memMob;
+        this.memGender = memGender;
+        this.memMail = memMail;
+        this.memAdd = memAdd;
+        this.memBd = memBd;
+        this.memCard = memCard;
+        this.provider = provider;
+        this.clientID = clientID;
+        this.displayName = displayName;
+        this.accessToken = accessToken;
+        this.refreshToken = refreshToken;
+        this.tknExpireTime = tknExpireTime;
+        this.creationTime = creationTime;
+        this.memberJoinTime = memberJoinTime;
+        this.memStat = memStat;
+        this.memPic = memPic;
+    }
+
+        public Member(Integer memNo, String memName, String memAcc, String memPwd, String memMob, Byte memGender, String memMail, String memAdd, Date memBd, String memCard, Byte provider, String clientID, String displayName, String accessToken, String refreshToken, Timestamp tknExpireTime, Timestamp creationTime, Timestamp memberJoinTime, Byte memStat, String memSalt, byte[] memPic) {
         this.memNo = memNo;
         this.memName = memName;
         this.memAcc = memAcc;
@@ -336,6 +360,14 @@ public class Member implements java.io.Serializable {
     public void setMemberJoinTime(Timestamp memberJoinTime) {
         this.memberJoinTime = memberJoinTime;
     }
+
+//    // 在保存之前設置當前時間
+//    @PrePersist
+//    public void setMemberJoinTime() {
+//        if (this.memberJoinTime == null) {
+//            this.memberJoinTime = new Timestamp(System.currentTimeMillis());
+//        }
+//    }
 
     public Byte getMemStat() {
         return memStat;

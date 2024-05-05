@@ -55,7 +55,9 @@ public class MemberServiceImpl implements MemberService {
         member.setMemBd(member.getMemBd());
 
         // 設定會員加入時間
-        member.setMemberJoinTime(new Timestamp(System.currentTimeMillis()));
+        if (member.getMemberJoinTime() == null) {
+            member.setMemberJoinTime(new Timestamp(System.currentTimeMillis()));
+        }
 
         // 0為信箱未驗證
         member.setMemStat((byte) 0);
