@@ -1,4 +1,4 @@
-package com.roger.member.service;
+package com.roger.member.main;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
