@@ -1,5 +1,6 @@
 package com.roger.converters;
 
+import com.roger.notice.entity.Notice;
 import org.springframework.core.convert.converter.Converter;
 
 import java.sql.Timestamp;

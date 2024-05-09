@@ -16,7 +16,7 @@ import java.util.regex.Pattern;
 public @interface ValidMemAccount {
 
     // 驗證失敗時顯示的錯誤處理
-    String message() default "會員帳號: 只能是英文字母、數字";
+    String message() default "會員帳號: 只能是英文字母、數字，且需要在4~10位之間";
 
     Class<?>[] groups() default{};
 

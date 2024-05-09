@@ -17,7 +17,7 @@ import java.util.regex.Pattern;
 public @interface ValidMemName {
 
     // 驗證失敗時顯示的錯誤處理
-    String message() default "會員姓名: 只能是中、英文字母、數字和_";
+    String message() default "會員姓名: 只能是中、英文字母、數字和_，且只能在2~10位";
 
     Class<?>[] groups() default{};
 

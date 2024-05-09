@@ -1,24 +1,25 @@
 package com.roger.notice.controller;
 
+import com.roger.member.entity.Member;
+import com.roger.member.service.MemberService;
 import com.roger.notice.entity.Notice;
+import com.roger.notice.entity.uniqueAnnotation.Create;
 import com.roger.notice.service.impl.NoticeServiceImpl;
-import com.utils.CustomTimestampConverter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.WebDataBinder;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.bind.annotation.InitBinder;
 
 import javax.validation.Valid;
 import java.io.IOException;
-import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 
 @Controller
@@ -27,6 +28,17 @@ public class NoticeControllerBackEnd {
 
     @Autowired
     public NoticeServiceImpl noticeService;
+
+    @Autowired
+    public MemberService memberService;
+
+    /**
+     * 前往查詢單個會員通知的頁面
+     */
+    @GetMapping("/getNoticeByMemNoData")
+    public String getNoticeByMemNoData(ModelMap modelMap) {
+        return "backend/notice/selectOnePage";
+    }
 
     /**
      * 前往新增頁面。
@@ -50,11 +62,11 @@ public class NoticeControllerBackEnd {
      * @throws IOException 如果在處理過程中發生 I/O 錯誤。
      */
     @PostMapping("/addNotice")
-    public String addNotice(@Valid Notice notice,
+    public String addNotice(@Validated(Create.class) Notice notice,
                             BindingResult result,
                             ModelMap modelMap) throws IOException {
 
-        System.out.println(notice.getNotContent());
+
         if (result.hasErrors()) {
             return "backend/notice/addNotice";
         }
@@ -92,11 +104,15 @@ public class NoticeControllerBackEnd {
      * @return 返回 "backend/notice/updateNotice" 視圖名稱，用於渲染修改通知頁面。
      */
     @GetMapping("updateNoticeData")
-    public String updateNoticeData(ModelMap modelMap,
-                                   @ModelAttribute("motNo") String motNo) {
+    public String updateNoticeData(@ModelAttribute("motNo") Integer motNo,
+                                   // @Validated(Create.class) Notice notice,
+                                    ModelMap modelMap
+                                   // BindingResult result
+    ) {
         System.out.println(motNo);
-        Notice oldData = noticeService.getOneNotice(Integer.valueOf(motNo));
-        System.out.println("test" + oldData);
+        Notice oldData = noticeService.getOneNotice(motNo);
+        // System.out.println("test" + oldData);
+        // modelMap.addAttribute("notice", notice);
         modelMap.addAttribute("data", oldData);
         return "backend/notice/updateNotice";
     }
@@ -114,7 +130,7 @@ public class NoticeControllerBackEnd {
      * @throws IOException 如果在過程中發生 I/O 錯誤。
      */
     @PostMapping("/updateNotice")
-    public String updateNotice(@ModelAttribute("data") @Valid Notice notice,
+    public String updateNotice(@ModelAttribute("data") @Validated(Create.class) Notice notice,
                                BindingResult result,
                                ModelMap modelMap) throws IOException {
 
@@ -133,6 +149,19 @@ public class NoticeControllerBackEnd {
         return "backend/notice/listAllNotice";
     }
 
+//    /**
+//     * 刪除指定的會員通知
+//     *
+//     */
+//    @PostMapping("/delete")
+//    public String deleteNotice(@RequestParam("motNo") String motNo) {
+//        boolean deleted = noticeService.deleteNotice(motNo);
+//        if (deleted) {
+//
+//        }
+//    }
+
+
     /**
      * 設置查詢全部通知列表的模型屬性。
      *
@@ -143,5 +172,37 @@ public class NoticeControllerBackEnd {
         List<Notice> list = noticeService.getAll();
         return list;
     }
+
+    @ModelAttribute("memberListData")
+    protected List<Member> referenceListData2() {
+        List<Member> list = memberService.findAll();
+        return list;
+    }
+
+//    /**
+//     * 使用 @ModelAttribute 創建一個方法來收集重複的通知內容
+//     */
+//    @ModelAttribute("duplicateNotices")
+//    public List<String> findDuplicateNotices(@ModelAttribute("notices") List<Notice> notices) {
+//        // 使用 Set 集合來追蹤已經出現過的內容
+//        Set<String> seen = new HashSet<>();
+//        // 使用 List 集合來收集重複的通知內容
+//        List<String> duplicates = new ArrayList<>();
+//
+//        // 遍歷通知列表
+//        for (Notice notice : notices) {
+//            String content = notice.getNotContent();
+//            // 如果在 seen 集合中已經存在，則表示重複內容
+//            if (seen.contains(content)) {
+//                duplicates.add(content);
+//            } else {
+//                // 如果在 seen 集合中不存在，則將其添加進去
+//                seen.add(content);
+//            }
+//        }
+
+        // 返回收集到的重複內容
+//        return duplicates;
+//    }
 
 }

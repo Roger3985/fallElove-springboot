@@ -2,13 +2,13 @@ package com.roger.member.controller;
 
 import com.roger.member.entity.Member;
 import com.roger.member.entity.uniqueAnnotation.Create;
+import com.roger.member.entity.uniqueAnnotation.CreateWithout;
 import com.roger.member.service.MemberService;
 import com.roger.notice.entity.Notice;
 import com.roger.notice.service.NoticeService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -26,13 +26,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.io.IOException;
-import java.sql.Date;
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -108,6 +103,10 @@ public class MemberControllerFrontEnd {
 
         // 將會員資料添加到模型中
         modelMap.addAttribute("myData", myData);
+        // 以下魔改
+//        Base64.Encoder encoder = Base64.getEncoder();
+//        String chaPic = encoder.encodeToString(myData.getMemPic());
+//        modelMap.addAttribute("chaPic", chaPic);
 
         // 返回要呈現的視圖名稱
         return "frontend/member/oneMember";
@@ -143,7 +142,7 @@ public class MemberControllerFrontEnd {
     }
 
     /**
-     * 前往登入頁面。
+     * 前往登入頁面 (透過信箱跟密碼登錄) 。
      * 此方法處理 HTTP GET 請求到 '/frontend/member/loginMember' URL 路徑。
      *
      * @return 要呈現的視圖名稱 "loginMember.html"。
@@ -151,6 +150,17 @@ public class MemberControllerFrontEnd {
     @GetMapping("/loginMember")
     public String goToLoginMember() {
         return "frontend/member/loginMember";
+    }
+
+    /**
+     * 前往登入頁面 (透過信箱跟密碼登錄) 。
+     * 此方法處理 HTTP GET 請求到 '/frontend/member/goToLoginMemberByAccount' URL 路徑。
+     *
+     * @return 要呈現的視圖名稱 "loginMemberByAccount.html"。
+     */
+    @GetMapping("/loginMemberByAccount")
+    public String goToLoginMemberByAccount() {
+        return "frontend/member/loginMemberByAccount";
     }
 
     /**
@@ -162,13 +172,14 @@ public class MemberControllerFrontEnd {
      * @return 要呈現的視圖名稱 "frontend/member/updateMember"。
      */
     @GetMapping("/updateData")
-    public String updateData(ModelMap modelMap, HttpSession session) {
+    public String updateData(ModelMap modelMap,
+                             HttpSession session) {
 
         // 從會話中獲取已登錄的會員資料
         Member oldData = (Member) session.getAttribute("loginsuccess");
 
         // 將會員的地址拆分為陣列
-        String[] add = oldData. getMemAdd().split(" ");
+        String[] add = oldData.getMemAdd().split(" ");
 
         // 如果會員的地址陣列長度為1，則直接將會員的資料添加到 modelMap 中
         if (add.length == 1) {
@@ -226,69 +237,260 @@ public class MemberControllerFrontEnd {
     }
 
     /**
-     * 處理會員登入請求。
-     * 此方法處理 HTTP POST 請求到 '/frontend/member/loginPage' URL 路徑，
-     * 接收會員的電子郵件和密碼，嘗試進行登入操作。
-     * 如果登入成功，將會員的訊息儲存到會話當中，並重定向到原始請求的 URI。
-     * 如果登入失敗，返回錯誤消息並繼續停留在登入頁面。
+     * 處理會員登入請求 (帳號或信箱和密碼)。
+     * 此方法處理 HTTP POST 請求到 '/frontend/member/loginPage' 和
+     * '/frontend/member/loginPageByMemAccount' URL 路徑，
+     * 接收會員的帳號或信箱和密碼，並嘗試進行登入操作。
+     * 如果登入成功，將會員的訊息儲存到會話中，並重定向到原始請求的 URI。
+     * 如果會員狀態是被禁止使用（狀態為 2），則刪除該會員的無權限標記，並顯示相關訊息。
+     * 如果登入失敗，增加會員的登入嘗試次數。
+     * 如果會員的登入嘗試次數達到或超過五次，將停權該會員並返回相關提示消息。
+     * 如果剩餘嘗試次數少於等於三次，顯示剩餘的嘗試次數。
+     * 根據請求的不同路徑（'/frontend/member/loginPage' 或 '/frontend/member/loginPageByMemAccount'），
+     * 對應返回不同的登入頁面名稱。
      *
-     * @param memMail 會員的電子郵件。
+     * @param identifier 會員的帳號或信箱。
      * @param memPwd 會員的密碼。
      * @param modelMap 包含模型屬性的 'ModelMap'。
-     * @param session 會話物件，用於儲存和訪問會員訊息。
-     * @param response 回應物件，用於處理重定向。
-     * @return 如果登入失敗，返回登入頁面名稱；如果成功，方法返回 null 並重定向到原始請求的 URI。
+     * @param session 用於存儲和訪問會員訊息的會話對象。
+     * @param response 用於處理重定向的回應對象。
+     * @param request 用於確定請求路徑的請求對象。
+     * @return 登入成功時，返回 null 並重定向到原始請求的 URI；
+     *         登入失敗時，返回對應的登入頁面名稱並顯示錯誤消息。
      */
-    @PostMapping("/loginPage")
-    public String loginPage(@ModelAttribute("mail") String memMail,
+    @PostMapping({"/loginPage", "/loginPageByMemAccount"})
+    public String loginPage(@ModelAttribute("identifier") String identifier,
                             @ModelAttribute("password") String memPwd,
                             ModelMap modelMap,
                             HttpSession session,
-                            HttpServletResponse response) {
+                            HttpServletResponse response,
+                            HttpServletRequest request) {
 
         // 獲取重定向的 URI 或設置默認值
         String uri = session.getAttribute("URI") == null ? "/" : session.getAttribute("URI").toString();
-
-        // 獲取項目的根路徑
         String projectUri = session.getServletContext().getContextPath();
 
-        // 檢查郵件和密碼是否為空
-        if (memMail.isEmpty() || memPwd.isEmpty()) {
-            modelMap.addAttribute("message", "信箱或密碼不能空白，請重新輸入!");
+        // 檢查帳號或信箱和密碼是否為空
+        if (identifier.isEmpty() || memPwd.isEmpty()) {
+            if (identifier.isEmpty()) {
+                if (request.getRequestURI().endsWith("/loginPage")) {
+                    modelMap.addAttribute("message", "信箱不能空白，請重新輸入!");
+                } else {
+                    modelMap.addAttribute("message", "帳號不能空白，請重新輸入!");
+                }
+            } else {
+                modelMap.addAttribute("message", "密碼不能空白，請重新輸入!");
+            }
+            return request.getRequestURI().endsWith("/loginPage")
+                    ? "frontend/member/loginMember"
+                    : "frontend/member/loginMemberByAccount";
+        }
+
+        // 從會話中獲取儲存的登錄失敗次數 Map 物件
+        Map<String, Integer> loginAttemptsMap = (Map<String, Integer>) session.getAttribute("loginAttemptsMap");
+        if (loginAttemptsMap == null) {
+            // 如果 Map 尚未初始化，創建一個新的 Map
+            loginAttemptsMap = new HashMap<>();
+            session.setAttribute("loginAttemptsMap", loginAttemptsMap);
+        }
+
+        // 根據請求路徑確定使用帳號還是信箱登入
+        Member loginData;
+        Member existingMember;
+        String memberKey;
+
+        if (request.getRequestURI().endsWith("/loginPage")) {
+            // 使用信箱進行登入
+            loginData = memberService.login(identifier, memPwd);
+            existingMember = memberService.findByMail(identifier);
+        } else {
+            // 使用帳號進行登入
+            loginData = memberService.loginByMemAcc(identifier, memPwd);
+            existingMember = memberService.findByMemAcc(identifier);
+        }
+
+        // 檢查會員是否存在於資料庫中
+        if (existingMember == null) {
+            // 根據請求路徑返回不同的錯誤消息
+            if (request.getRequestURI().endsWith("/loginPage")) {
+                // 信箱登入頁面
+                modelMap.addAttribute("message", "沒有該會員信箱，請確認您的信箱。");
+            } else {
+                // 帳號登入頁面
+                modelMap.addAttribute("message", "沒有該會員帳號，請確認您的帳號。");
+            }
+            return request.getRequestURI().endsWith("/loginPage")
+                    ? "frontend/member/loginMember"
+                    : "frontend/member/loginMemberByAccount";
+        }
+
+        // 使用會員ID作為 `loginAttemptsMap` 的鍵，以跟蹤同一會員的登入失敗次數
+        memberKey = existingMember.getMemNo().toString();
+        Integer attemptCount = loginAttemptsMap.getOrDefault(memberKey, 0);
+
+        // 如果會員狀態是 2，表示會員已經被禁止使用
+        if (existingMember.getMemStat() == 2) {
+            // 刪除無權限會員的標記
+            redisTemplate.delete("noFun" + existingMember.getMemNo().toString());
+            modelMap.addAttribute("noFun", "此會員已無權限，請洽詢相關的工作人員");
+            return request.getRequestURI().endsWith("/loginPage")
+                    ? "frontend/member/loginMember"
+                    : "frontend/member/loginMemberByAccount";
+        }
+
+        // 如果登錄失敗
+        if (loginData == null) {
+            // 增加該會員的登錄失敗次數
+            attemptCount++;
+            loginAttemptsMap.put(memberKey, attemptCount);
+
+            // 如果嘗試次數達到或超過五次，則停權該會員並返回提示訊息
+            if (attemptCount >= 5) {
+                modelMap.addAttribute("message", "此會員已遭停權，請聯繫官方客服尋求幫助");
+                // 停權會員
+                if (request.getRequestURI().endsWith("/loginPage")) {
+                    banMemberByMail(identifier, session, modelMap);
+                } else {
+                    banMemberByMemAcc(identifier, session, modelMap);
+                }
+                return request.getRequestURI().endsWith("/loginPage")
+                        ? "frontend/member/loginMember"
+                        : "frontend/member/loginMemberByAccount";
+            }
+
+
+            // 細分登入失敗的原因
+            if (existingMember != null) {
+                // 檢查密碼是否正確
+                if (!existingMember.getMemPwd().equals(memPwd)) {
+                    // 密碼錯誤
+                    modelMap.addAttribute("message", "密碼輸入錯誤，請重新輸入!");
+                } else {
+                    // 因為會員存在但密碼正確，所以可能是其他原因造成的錯誤
+                    modelMap.addAttribute("message", "未知的登入錯誤，請稍後再試。");
+                }
+            } else {
+                // 會員不存在，所以可能是帳號或信箱錯誤
+                if (request.getRequestURI().endsWith("/loginPage")) {
+                    modelMap.addAttribute("message", "信箱錯誤，請重新輸入!");
+                } else {
+                    modelMap.addAttribute("message", "帳號錯誤，請重新輸入!");
+                }
+            }
+
+            if (5 - attemptCount <= 3) {
+                modelMap.addAttribute("message", "您剩餘 " + (5 - attemptCount) + " 次嘗試次數");
+            }
+
+            return request.getRequestURI().endsWith("/loginPage")
+                    ? "frontend/member/loginMember"
+                    : "frontend/member/loginMemberByAccount";
+        }
+
+        // 登錄成功，清除該會員登錄失敗的次數
+        loginAttemptsMap.remove(memberKey);
+
+        // FIXME 修改
+        // 獲取會員的通知
+        Notice notice = noticeService.getOneByMember(loginData);
+
+        // 從會話中移除 "URI" 屬性，以避免重複重定向
+        session.removeAttribute("URI");
+
+        // 登入成功後，將會員訊息和通知訊息儲存到會話中
+        session.setAttribute("loginsuccess", loginData);
+        session.setAttribute("notice", notice);
+
+        // 重定向到原始請求的 URI
+        try {
+            response.sendRedirect(projectUri + uri);
+            return null;
+        } catch (IOException e) {
+            // 處理重定向的 IOException
+            e.printStackTrace();
+        }
+
+        return request.getRequestURI().endsWith("/loginPage")
+                ? "frontend/member/loginMember"
+                : "frontend/member/loginMemberByAccount";
+    }
+
+    /**
+     * 停權指定的會員信箱並立即登出該會員。
+     * 此方法接受會員的電子郵件 (`memMail`) 作為參數，通過該電子郵件查找會員，
+     * 並將該會員設置為被停權（狀態為 2）。
+     * 此外，該方法會在 Redis 中存儲會員編號作為 "noFun" 標記，
+     * 並終止該會員的 HTTP 會話，強制登出該會員。
+     *
+     * @param memMail 要停權的會員電子郵件。
+     * @param session HTTP 會話 (`HttpSession`) 用於終止該會員的會話。
+     * @param modelMap 用於返回訊息的模型對象。
+     * @return 成功停權後，重定向至會員列表頁面；若找不到會員，則返回登入頁面。
+     */
+    @PostMapping("/banMemberMail")
+    public String banMemberByMail(@ModelAttribute("memMail") String memMail,
+                                  HttpSession session,
+                                  ModelMap modelMap) {
+        // 使用電子郵件查找會員
+        Member member = memberService.findByMail(memMail);
+
+        if (member != null) {
+            // 停權會員
+            memberService.banMember(member);
+
+            // 將會員編號存儲在 Redis 中，標記為 "noFun"
+            redisTemplate.opsForValue().set("noFun:members:" + member.getMemNo(), String.valueOf(member.getMemNo()));
+
+            // 終止該會員的會話
+            session.invalidate();
+        } else {
+            // FIXME 如果找不會會員，可以根據開發人員的需求處理錯誤，例如:紀錄錯誤或返回錯誤消息
+            modelMap.addAttribute("message", "找不到與此電子郵件地址相對應的會員。");
             return "frontend/member/loginMember";
         }
 
-        // 嘗試登入
-        Member loginData = memberService.login(memMail, memPwd);
-        if (loginData != null) {
-            if (loginData.getMemStat() == 2) {
-                redisTemplate.delete("noFun" + loginData.getMemNo().toString());
-                modelMap.addAttribute("noFun", "此帳號已無權限，請洽詢相關的工作人員");
-                return "frontend/member/loginMember";
-            }
+        // 重定向到會員列表頁面
+        return "redirect:/backend/member/memberlist";
+    }
 
-            Notice notice = noticeService.getOneByMember(loginData);
+    /**
+     * 停權指定的會員帳號並立即登出該會員。
+     * 此方法接受會員的帳號 (`memAcc`) 作為參數，通過該帳號查找會員，
+     * 並將該會員設置為被停權（狀態為 2）。
+     * 此外，該方法會在 Redis 中存儲會員編號作為 "noFun" 標記，
+     * 並終止該會員的 HTTP 會話，強制登出該會員。
+     *
+     * @param memAcc 要停權的會員帳號。
+     * @param session HTTP 會話 (`HttpSession`) 用於終止該會員的會話。
+     * @param modelMap 用於返回訊息的模型對象。
+     * @return 成功停權後，重定向至會員列表頁面；若找不到會員，則返回登入頁面。
+     */
+    @PostMapping("/banMemberByMemAcc")
+    public String banMemberByMemAcc(@ModelAttribute("memAcc") String memAcc,
+                                    HttpSession session,
+                                    ModelMap modelMap) {
+        // 使用會員帳號查找會員
+        Member member = memberService.findByMemAcc(memAcc);
 
-            // 登入成功，將會員信息儲存到會話中
-            session.setAttribute("loginsuccess", loginData);
-            session.removeAttribute("URI");
-            session.setAttribute("notice", notice);
-            session.removeAttribute("URI");
+        if (member != null) {
+            // 停權會員
+            memberService.banMember(member);
 
-            // 重定向到原始請求的 URI
-            try {
-                response.sendRedirect(projectUri + uri);
-                return null;
-            } catch (IOException e) {
-                // 處理重定向的 IOException
-                e.printStackTrace();
-            }
+            // 將會員編號存儲在 Redis 中，標記為 "noFun"
+            redisTemplate.opsForValue().set("noFun:members:" + member.getMemNo(), String.valueOf(member.getMemNo()));
+
+            // 終止該會員的會話
+            session.invalidate();
+        } else {
+            // FIXME 如果找不會會員，可以根據開發人員的需求處理錯誤，例如:紀錄錯誤或返回錯誤消息
+            modelMap.addAttribute("message", "找不到與此電子郵件地址相對應的會員。");
+            return "frontend/member/loginMember";
         }
 
-        // 登入失敗，返回錯誤消息
-        modelMap.addAttribute("message", "信箱或密碼輸入錯誤，請重新輸入!");
-        return "frontend/member/loginMember";
+        // 重定向到會員列表頁面
+        return "redirect:/backend/member/memberlist";
     }
+
 
     /**
      * 新增會員資料。
@@ -390,7 +592,8 @@ public class MemberControllerFrontEnd {
      */
     @PostMapping("/updateMember")
     public String updateMember(@RequestParam("memPic") MultipartFile part,
-                               @ModelAttribute("data") @Valid Member member,
+                               @ModelAttribute("data")
+                               @Validated(CreateWithout.class) Member member,
                                BindingResult result,
                                ModelMap modelMap,
                                @RequestParam("country") String country,
@@ -417,19 +620,26 @@ public class MemberControllerFrontEnd {
 
         // 設置會員的完整地址
         String detailAdd = member.getMemAdd();
+//        member.setMemAdd(detailAdd);
         member.setMemAdd(country + " " + district + " " + detailAdd);
 
-        // 如果有會員圖片，將其存儲到 member 物件中
-        member.setMemPic(part.isEmpty() ? memberService.findByNo(member.getMemNo()).getMemPic() : part.getBytes());
+         // 如果有會員圖片，將其存儲到 member 物件中
+         member.setMemPic(part.isEmpty() ? memberService.findByNo(member.getMemNo()).getMemPic() : part.getBytes());
 
         // 移除 memPic 字段中的錯誤信息
         result = removeFieldError(member, result, "memPic");
 
         System.out.println(result.getFieldErrors());
 
+//        member.setMemStat(member.getMemStat());
+
+        // 將會員重置後的密碼加密
+        member.setMemPwd(memberService.hashPassword(member.getMemPwd()));
+
         // 如果驗證失敗或模型數據中存在重複項，則返回前端更新會員頁面
         if (result.hasErrors() || modelMap.get("duplicateAccount") != null || modelMap.get("duplicateMobile") != null || modelMap.get("duplicateMail") != null) {
             member.setMemAdd(detailAdd);
+            modelMap.addAttribute("member", member);
             return "frontend/member/updateMember";
         }
 
@@ -486,34 +696,6 @@ public class MemberControllerFrontEnd {
         }
     }
 
-//    /**
-//     * 更改會員的大頭貼。
-//     * 此方法處理 HTTP POST 請求以更改會員的大頭貼，並更新會話中的會員資料。
-//     * @param part    表示新大頭貼的 MultipartFile 物件。
-//     * @param session 用於管理用戶會話的 HttpSession 物件。
-//     * @return        更改後的重定向 URL，重定向到會員中心頁面。
-//     *  */
-//    @PostMapping("newPicture2")
-//    public String newPicture2(@RequestParam("chaPic") MultipartFile part, HttpSession session) {
-//
-//        // 獲取當前會話中的會員物件
-//        Member member = (Member) session.getAttribute("loginsuccess");
-//
-//        try {
-//            // 更改會員大頭貼並獲取更新後的會員物件
-//            memberService.changePicture(member, part.getBytes());
-//            Member newData = memberService.findByNo(member.getMemNo());
-//
-//            // 更新會話中的會員物件
-//            session.setAttribute("loginsuccess", newData);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//
-//        // 返回重定向 URL，重定向到會員中心頁面
-//        return "redirect:/frontend/member/memberData";
-//    }
-
     /**
      * 處理前往驗證的請求。
      * 此方法處理 HTTP GET 請求到 '/frontend/member/varifiedMail' URL 路徑，
@@ -525,6 +707,22 @@ public class MemberControllerFrontEnd {
     @GetMapping("/varifyMail")
     public String varifyMail(ModelMap modelMap) {
         return "frontend/member/varifiedMail";
+    }
+
+    /**
+     * 從單一個會員進行驗證
+     */
+    @GetMapping("/varifyMailByOneMember")
+    public String varifyMailByOneMember(ModelMap modelMap,
+                                        HttpSession session) {
+        // 從會話中獲取當前登入的會員訊息
+        Member member = (Member) session.getAttribute("loginsuccess");
+
+        // 發送驗證郵件
+        memberService.verifyMail(member.getMemMail(), "Fall衣Love!", "驗證碼為:", null);
+
+        // 返回驗證電子郵件的重定向 URL
+        return "redirect:/frontend/member/varifyMail";
     }
 
     /**
@@ -602,22 +800,30 @@ public class MemberControllerFrontEnd {
     }
 
     /**
+     * 密碼的正則表達式
+     */
+    private static final String MEMBER_PASSWORD_PATTERN = "^[a-zA-Z0-9]{1,20}$";
+
+    /**
      * 處理會員變更密碼的請求。
      * 此方法處理 HTTP POST 請求到 '/frontend/member/changePassword' URL 路徑，
-     * 接收會員的舊密碼和新密碼，嘗視進行密碼變更操作。
-     * 如果密碼變更成功，將會員的訊息更新到會話當中，並重定向到會員中心頁面。
-     * 如果發生錯誤，返回錯誤消息並繼續停留在變更密碼頁碼。
+     * 接收會員的舊密碼和新密碼並嘗試進行密碼變更操作。
+     * 如果變更成功，將會員訊息更新到會話中，並重定向到會員中心頁面。
+     * 如果發生錯誤，則返回錯誤訊息並繼續停留在變更密碼頁面。
      *
      * @param oldPassword 會員的舊密碼。
      * @param newPassword 會員的新密碼。
-     * @param modelMap 包含模型屬性的 'ModelMap'。
-     * @param session 會話物件，用於儲存和訪問會員訊息。
-     * @return 如果發生錯誤，返回變更密碼的頁面名稱；如果成功，方法返回 null 並重定向到會員中心頁面。
+     * @param againNewPassword 會員的新密碼再次填寫一次，要跟新密碼一樣。
+     * @param modelMap 用於存放模型屬性的 ModelMap。
+     * @param session 用於儲存和訪問會員訊息的 HttpSession 物件。
+     * @return 如果發生錯誤，返回變更密碼頁面的名稱；如果成功，返回 null 並重定向到會員中心頁面。
      */
     @PostMapping("/changePassword")
     public String changePassword(@RequestParam("oldPassword") String oldPassword,
                                  @RequestParam("newPassword") String newPassword,
-                                 ModelMap modelMap, HttpSession session) {
+                                 @RequestParam("againNewPassword") String againNewPassword,
+                                 ModelMap modelMap,
+                                 HttpSession session) {
 
         // 從會話中獲取當前登入的會員訊息
         Member member = (Member) session.getAttribute("loginsuccess");
@@ -626,12 +832,27 @@ public class MemberControllerFrontEnd {
         if (oldPassword.isEmpty()) {
             modelMap.addAttribute("emptyOldPassword", "舊密碼不可為空白，請重新輸入!");
         } else if (!member.getMemPwd().equals(memberService.hashPassword(oldPassword))) {
+            // 檢查舊密碼是否輸入正確
             modelMap.addAttribute("oldError", "密碼輸入錯誤，請重新輸入!");
         }
 
         // 檢查新密碼是否為空白
         if (newPassword.isEmpty()) {
             modelMap.addAttribute("emptyNewPassword", "新密碼不可為空白，請重新輸入!");
+        } else if (!newPassword.matches(MEMBER_PASSWORD_PATTERN)) {
+            // 檢查會員新密碼是否符合正則表達式
+            modelMap.addAttribute("newError", "新密碼只能包含英文字母和數字，且長度不超過 20 個字符，請重新輸入!");
+        }
+
+        // 檢查再次填寫新密碼是否為空白
+        if (againNewPassword.isEmpty()) {
+            modelMap.addAttribute("emptyAgainNemPassword", "再次輸入密碼不可為空白，請重新輸入!");
+        }  else if (!againNewPassword.matches(MEMBER_PASSWORD_PATTERN)) {
+            // 檢查會員再次填寫新密碼是否符合正則表達式
+            modelMap.addAttribute("againNemPasswordError", "再次填寫新密碼只能包含英文字母和數字，且長度不超過 20 個字符，請重新輸入!");
+        } else if (!newPassword.equals(againNewPassword)) {
+            // 檢查再次填寫的新密碼是否跟第一次填寫的新密碼一樣
+            modelMap.addAttribute("notSameError", "再次填寫的新密碼跟第一次填寫的新密碼不一樣，請重新輸入!");
         }
 
         // 如果模型存在錯誤，返回變更密碼頁面
@@ -646,8 +867,464 @@ public class MemberControllerFrontEnd {
         // 更新會話中的會員訊息
         session.setAttribute("loginsuccess", member);
 
-        // 重定向到會員中心頁面
-        return "redirect:/frontend/member/memberCenter";
+        // 重定向到個人資訊頁面
+        return "redirect:/frontend/member/memberData";
+    }
+
+    /**
+     * 前往變更會員名稱頁面。
+     * 此方法處理 HTTP GET 請求到 '/frontend/member/newMemberName' URL 路徑，
+     * 並將當前會員的名稱預填到舊名稱欄位中，返回變更會員名稱頁面的視圖。
+     *
+     * @param modelMap 包含模型屬性的 'ModelMap'。
+     * @param session 會話物件，用於儲存和訪問會員訊息。
+     * @return 變更會員名稱頁面的視圖名稱。
+     */
+    @GetMapping("/newMemberName")
+    public String newMemberName(ModelMap modelMap,
+                                HttpSession session) {
+
+        // 從會話中獲取當前登入的會員訊息
+        Member member = (Member) session.getAttribute("loginsuccess");
+
+        // 將會員舊名稱添加到模型中，以便在前端頁面中預填
+        modelMap.addAttribute("oldMemberName", member.getMemName());
+
+        // 返回變更會員名稱頁面的視圖名稱
+        return "frontend/member/changeMemberName";
+    }
+
+    /**
+     * 會員名稱的正則表達式
+     */
+    private static final String MEMBER_NAME_PATTERN = "^[(\u4e00-\u9fa5)(a-zA-Z0-9_)]{2,10}$";
+
+    /**
+     * 處理會員變更名稱的請求。
+     * 此方法處理 HTTP POST 請求到 '/frontend/member/changeMemberName' URL 路徑，
+     * 接收會員的舊名稱和新名稱並嘗試進行名稱變更操作。
+     * 如果變更成功，將會員訊息更新到會話中，並重定向到個人資訊頁面，
+     * 保留會員新的名稱。
+     * 如果發生錯誤，則返回錯誤訊息並繼續停留在變更名稱頁面。
+     *
+     * @param oldMemberName 會員的舊名稱。
+     * @param newMemberName 會員的新名稱。
+     * @param modelMap 用於存放模型屬性的 ModelMap。
+     * @param session 用於儲存和訪問會員訊息的 HttpSession 物件。
+     * @return 如果發生錯誤，返回變更名稱頁面的名稱；如果成功，返回 null 並重定向到個人資訊頁面，保留會員新的名稱。
+     */
+    @PostMapping("/changeMemberName")
+    public String changeMemberName(@RequestParam("oldMemberName") String oldMemberName,
+                                   @RequestParam("newMemberName") String newMemberName,
+                                   ModelMap modelMap,
+                                   HttpSession session) {
+
+        // 從會話中獲取當前登錄的會員訊息
+        Member member = (Member) session.getAttribute("loginsuccess");
+
+        // 檢查舊會員名稱是否為空白
+        if (oldMemberName.isEmpty()) {
+            modelMap.addAttribute("emptyOldMemberName", "舊會員名稱不可為空白，請重新輸入!");
+        } else if (!member.getMemName().equals(oldMemberName)) {
+            // 檢查就會員名稱是否輸入正確
+            modelMap.addAttribute("oldMemberError", "會員名稱輸入有誤，請重新輸入!");
+        }
+
+        // 檢查新會員名稱是否為空白
+        if (newMemberName.isEmpty()) {
+            modelMap.addAttribute("emptyNemMemberName");
+        } else if (!newMemberName.matches(MEMBER_NAME_PATTERN)) {
+            // 檢查會員新名稱是否符合正則表達式
+            modelMap.addAttribute("newMemberNameError", "會員姓名: 只能是中、英文字母、數字和_，且只能在2~10位");
+        }
+
+        // 如果模型存在錯誤，返回變更會員名稱頁面
+        if (!modelMap.isEmpty()) {
+            // 將舊會員名稱重新添加到模型中
+            modelMap.addAttribute("oldMemberName", oldMemberName);
+            // FIXME 將不符合正則表達式的會員名稱重新添加到模型中 (可有可無)，尚未完成
+            // modelMap.addAttribute("newMemberName", newMemberName);
+            return "frontend/member/changeMemberName";
+        }
+
+        // 將會員的名稱設置為新名稱
+        member.setMemName(newMemberName);
+        memberService.edit(member);
+
+        // 更新會話中的會員訊息
+        session.setAttribute("loginsuccess", member);
+
+        // 重定向到個人資訊頁面
+        return "redirect:/frontend/member/memberData";
+    }
+
+    /**
+     * 前往變更會員帳號頁面。
+     * 此方法處理 HTTP GET 請求到 '/frontend/member/newMemberAccount' URL 路徑，
+     * 並將當前會員的帳號預填到舊帳號欄位中，返回變更會員帳號頁面的視圖。
+     *
+     * @param modelMap 包含模型屬性的 'ModelMap'。
+     * @param session 會話物件，用於儲存和訪問會員訊息。
+     * @return 變更會員帳號頁面的視圖名稱。
+     */
+    @GetMapping("/newMemberAccount")
+    public String newMemberAccount(ModelMap modelMap,
+                                   HttpSession session) {
+
+        // 從會話中獲取當前登入的會員訊息
+        Member member = (Member) session.getAttribute("loginsuccess");
+
+        // 將會員舊帳號添加到模型中，以便在前端頁面中預填
+        modelMap.addAttribute("oldMemberAccount", member.getMemAcc());
+
+        // 返回變更會員帳號名稱頁面的視圖名稱
+        return "frontend/member/changeMemberAccount";
+    }
+
+    /**
+     * 會員帳號的正則表達式
+     */
+    private static final String MEMBER_ACCOUNT_PATTERN = "^[a-zA-Z0-9]{4,10}$";
+
+    /**
+     * 處理會員帳號變更請求。
+     * 此方法處理 HTTP POST 請求到 '/frontend/member/changeMemberAccount' URL 路徑，
+     * 接收舊會員帳號和新會員帳號的請求參數。
+     * 如果輸入的舊會員帳號或新會員帳號不符合要求，將在模型中添加相應的錯誤消息，
+     * 並返回到變更會員帳號的頁面，讓會員重新輸入。
+     * 如果變更成功，將更新會員帳號，並在會話中更新會員信息。
+     *
+     * @param oldMemberAccount 舊會員帳號。
+     * @param newMemberAccount 新會員帳號。
+     * @param modelMap 包含模型屬性的 'ModelMap'。
+     * @param session 用於存儲和訪問會員訊息的會話對象。
+     * @return 如果模型中存在錯誤，返回到變更會員帳號頁面；否則重定向到個人資訊頁面。
+     */
+    @PostMapping("/changeMemberAccount")
+    public String changeMemberAccount(@RequestParam("oldMemberAccount") String oldMemberAccount,
+                                      @RequestParam("newMemberAccount") String newMemberAccount,
+                                      ModelMap modelMap,
+                                      HttpSession session) {
+
+        // 從會話中獲取當前登錄的會員訊息
+        Member member = (Member) session.getAttribute("loginsuccess");
+
+        // 檢查舊會員帳號是否為空白
+        if (oldMemberAccount.isEmpty()) {
+            modelMap.addAttribute("emptyoldMemberAccount", "舊會員帳號不可為空白，請重新輸入!");
+        } else if (!member.getMemAcc().equals(oldMemberAccount)) {
+            // 檢查就會員帳號是否輸入正確
+            modelMap.addAttribute("oldMemberAccountError", "會員帳號輸入有誤，請重新輸入!");
+        }
+
+        // 檢查新會員帳號是否為空白
+        if (newMemberAccount.isEmpty()) {
+            modelMap.addAttribute("emptyNemMemberAccount", "新會員帳號不可為空白，請重新輸入!");
+        } else if (!newMemberAccount.matches(MEMBER_ACCOUNT_PATTERN)) {
+            // 檢查會員新帳號是否符合正則表達式
+            modelMap.addAttribute("newMemberAccountError", "會員帳號: 只能是英文字母、數字，且需要在4~10位之間");
+        }
+
+        // 檢查是否有同樣的會員帳號
+        if (memberService.existMemAccount(newMemberAccount)) {
+            // 如果找到相同會員帳號，且該會員帳號不是當前會員的舊帳號
+            if (!newMemberAccount.equals(oldMemberAccount)) {
+                modelMap.addAttribute("sameMemberAccountError", "會員帳號已存在，請嘗試其他的會員帳號");
+            }
+        }
+
+        // 如果模型存在錯誤，返回變更會員帳號頁面
+        if (!modelMap.isEmpty()) {
+            // 將舊會員帳號重新添加到模型中
+            modelMap.addAttribute("oldMemberAccount", oldMemberAccount);
+            return "frontend/member/changeMemberAccount";
+        }
+
+        // 將會員的帳號設置為新的名稱
+        member.setMemAcc(newMemberAccount);
+        memberService.edit(member);
+
+        // 更新會話中的會員訊息
+        session.setAttribute("loginsuccess", member);
+
+        // 重定向到個人資訊頁面
+        return "redirect:/frontend/member/memberData";
+    }
+
+    /**
+     * 前往變更會員電話頁面。
+     * 此方法處理 HTTP GET 請求到 '/frontend/member/newMemberMobile' URL 路徑，
+     * 並將當前會員的電話預填到舊電話欄位中，返回變更會員電話頁面的視圖。
+     *
+     * @param modelMap 包含模型屬性的 'ModelMap'。
+     * @param session 會話物件，用於儲存和訪問會員訊息。
+     * @return 變更會員電話頁面的視圖名稱。
+     */
+    @GetMapping("/newMemberMobile")
+    public String newMemberMobile(ModelMap modelMap,
+                                  HttpSession session) {
+
+        // 從會話中獲取當前登錄的會員訊息
+        Member member = (Member) session.getAttribute("loginsuccess");
+
+        // 將會員舊電話添加到模型中，以便在前端頁面中預填
+        modelMap.addAttribute("oldMemberMobile", member.getMemMob());
+
+        // 返回變更會員電話頁面的視圖名稱
+        return "frontend/member/changeMemberMobile";
+    }
+
+    /**
+     * 會員電話的正則表達式
+     */
+    private static final String MEMBER_MOBILE_PATTERN = "^[0][9]\\d{8}$";
+
+
+    /**
+     * 處理會員電話變更請求。
+     * 此方法處理 HTTP POST 請求到 '/frontend/member/changeMemberMobile' URL 路徑，
+     * 接收舊會員電話和新會員電話的請求參數。
+     * 如果輸入的舊會員電話或新會員電話不符合要求，將在模型中添加相應的錯誤消息，
+     * 並返回到變更會員電話的頁面，讓會員重新輸入。
+     * 如果變更成功，將更新會員電話，並在會話中更新會員信息。
+     *
+     * @param oldMemberMobile 舊會員電話。
+     * @param newMemberMobile 新會員電話。
+     * @param modelMap 包含模型屬性的 'ModelMap'。
+     * @param session 用於存儲和訪問會員訊息的會話對象。
+     * @return 如果模型中存在錯誤，返回到變更會員電話頁面；否則重定向到個人資訊頁面。
+     */
+    @PostMapping("/changeMemberMobile")
+    public String changeMemberMobile(@RequestParam("oldMemberMobile") String oldMemberMobile,
+                                     @RequestParam("newMemberMobile") String newMemberMobile,
+                                     ModelMap modelMap,
+                                     HttpSession session) {
+
+        // 從會話中獲取當前登錄的會員訊息
+        Member member = (Member) session.getAttribute("loginsuccess");
+
+        // 保存原始的 oldMemberMobile 值
+        // String originalOldMemberMobile = oldMemberMobile;
+
+        // 檢查舊會員電話是否為空白
+        if (oldMemberMobile.isEmpty()) {
+            modelMap.addAttribute("emptyoldMemberMobile", "舊會員電話不可為空白，請重新輸入!");
+        } else if (!member.getMemMob().equals(oldMemberMobile)) {
+            // 檢查就會員電話是否輸入正確
+            modelMap.addAttribute("oldMemberMobileError", "會員電話輸入有誤，請重新輸入!");
+        }
+
+        // 檢查會員新電話是否為空白
+        if (newMemberMobile.isEmpty()) {
+            modelMap.addAttribute("emptyNewMemberMobile", "會員新的電話不可為空白，請重新輸入!");
+        } else if (!newMemberMobile.matches(MEMBER_MOBILE_PATTERN)) {
+            // 檢查會員新電話是否符合正則表達式
+            modelMap.addAttribute("newMemberMobileError", "手機格式錯誤，請輸入以下的格式:09XXXXXXXX");
+        }
+
+        // 檢查是否有同樣的電話
+        if (memberService.existMemMobile(newMemberMobile)) {
+            // 如果找到相同電話，且該電話不是當前會員的舊電話
+            if (!newMemberMobile.equals(oldMemberMobile)) {
+                modelMap.addAttribute("sameMemberMobileError", "會員電話已存在，請嘗試其他手機號碼");
+            }
+        }
+
+        // 如果模型存在錯誤，返回變更會員電話頁面
+        if (!modelMap.isEmpty()) {
+            // 將原始的就會員電話重新添加到模型中
+            modelMap.addAttribute("oldMemberMobile", oldMemberMobile);
+            return "frontend/member/changeMemberMobile";
+        }
+
+        // 將會員的電話設置為新的電話
+        member.setMemMob(newMemberMobile);
+        memberService.edit(member);
+
+        // 更新會話中的會員訊息
+        session.setAttribute("loginsuccess", member);
+
+        // 重定向到個人資訊頁面
+        return "redirect:/frontend/member/memberData";
+    }
+
+    /**
+     * 前往變更會員信箱頁面。
+     * 此方法處理 HTTP GET 請求到 '/frontend/member/newMemberMail' URL 路徑，
+     * 並將當前會員的信箱預填到舊信箱欄位中，返回變更會員信箱頁面的視圖。
+     *
+     * @param modelMap 包含模型屬性的 'ModelMap'。
+     * @param session 會話物件，用於儲存和訪問會員訊息。
+     * @return 變更會員信箱頁面的視圖名稱。
+     */
+    @GetMapping("/newMemberMail")
+    public String newMemberMail(ModelMap modelMap,
+                                HttpSession session) {
+
+        // 從會話中獲取當前登錄的會員訊息
+        Member member = (Member) session.getAttribute("loginsuccess");
+
+        // 將會員舊信箱添加到模型中，以便在前端頁面中預填
+        modelMap.addAttribute("oldMemberMail", member.getMemMail());
+
+        // 返回變更會員地址頁面的視圖名稱
+        return "frontend/member/changeMemberMail";
+    }
+
+    /**
+     * 會員信箱的正則表達式
+     */
+    private static final String MEMBER_MAIL_PATTERN = "^[\\w-_\\.+]*[\\w-_\\.]\\@([\\w]+\\.)+[\\w]+[\\w]$";
+
+    /**
+     * 處理會員信箱變更請求。
+     * 此方法處理 HTTP POST 請求到 '/frontend/member/changeMemberMail' URL 路徑，
+     * 接收舊會員信箱和新會員信箱的請求參數。
+     * 如果輸入的舊會員信箱或新會員信箱不符合要求，將在模型中添加相應的錯誤消息，
+     * 並返回到變更會員信箱的頁面，讓會員重新輸入。
+     * 如果變更成功，將更新會員信箱，並在會話中更新會員信息。
+     *
+     * @param oldMemberMail 舊會員信箱。
+     * @param newMemberMail 新會員信箱。
+     * @param modelMap 包含模型屬性的 'ModelMap'。
+     * @param session 用於存儲和訪問會員訊息的會話對象。
+     * @return 如果模型中存在錯誤，返回到變更會員信箱頁面；否則重定向到個人資訊頁面。
+     */
+    @PostMapping("/changeMemberMail")
+    public String changeMemberMail(@RequestParam("oldMemberMail") String oldMemberMail,
+                                   @RequestParam("newMemberMail") String newMemberMail,
+                                   ModelMap modelMap,
+                                   HttpSession session) {
+
+        // 從會話中獲取當前登錄的會員訊息
+        Member member = (Member) session.getAttribute("loginsuccess");
+
+        // 檢查舊會員信箱是否為空白
+        if (oldMemberMail.isEmpty()) {
+            modelMap.addAttribute("emptyoldMemberMail", "舊會員信箱不可為空白，請重新輸入!");
+        } else if (!member.getMemMail().equals(oldMemberMail)) {
+            // 檢查就會員信箱是否輸入正確
+            modelMap.addAttribute("oldMemberMailError", "會員信箱輸入有誤，請重新輸入!");
+        }
+
+        // 檢查會員新電話是否為空白
+        if (newMemberMail.isEmpty()) {
+            modelMap.addAttribute("emptyNewMemberMail", "會員新的信箱不可為空白，請重新輸入!");
+        } else if (!newMemberMail.matches(MEMBER_MAIL_PATTERN)) {
+            // 檢查會員新信箱是否符合正則表達式
+            modelMap.addAttribute("newMemberMailError", "信箱格式輸入錯誤！，請輸入xxx@gmail.com or xxx@yahoo.com...");
+        }
+
+        // 檢查是否有同樣的信箱
+        if (memberService.existMemMail(newMemberMail)) {
+            // 如果找到相同信箱，且該信箱不是當前會員的舊信箱
+            if (!newMemberMail.equals(oldMemberMail)) {
+                modelMap.addAttribute("sameMemberMailError", "會員信箱已存在，請嘗試其他信箱");
+            }
+        }
+
+        // 如果模型存在錯誤，返回變更會員信箱頁面
+        if (!modelMap.isEmpty()) {
+            // 將原始的就會員信箱重新添加到模型中
+            modelMap.addAttribute("oldMemberMail", oldMemberMail);
+            return "frontend/member/changeMemberMail";
+        }
+
+        // 將會員的信箱設置為新的信箱
+        member.setMemMail(newMemberMail);
+        memberService.edit(member);
+
+        // 更新會話中的會員訊息
+        session.setAttribute("loginsuccess", member);
+
+        // 重定向到個人資訊頁面
+        return "redirect:/frontend/member/memberData";
+    }
+
+
+    /**
+     * 前往變更會員地址頁面。
+     * 此方法處理 HTTP GET 請求到 '/frontend/member/newMemberAddress' URL 路徑，
+     * 並將當前會員的地址預填到舊地址欄位中，返回變更會員地址頁面的視圖。
+     *
+     * @param modelMap 包含模型屬性的 'ModelMap'。
+     * @param session 會話物件，用於儲存和訪問會員訊息。
+     * @return 變更會員地址頁面的視圖名稱。
+     */
+    @GetMapping("/newMemberAddress")
+    public String newMemberAddress(ModelMap modelMap,
+                                   HttpSession session) {
+
+        // 從會話中獲取當前登錄的會員訊息
+        Member member = (Member) session.getAttribute("loginsuccess");
+
+        // 將會員舊地址添加到模型中，以便在前端頁面中預填
+        modelMap.addAttribute("oldMemberAddress", member.getMemAdd());
+
+        // 返回變更會員地址頁面的視圖名稱
+        return "frontend/member/changeMemberAddress";
+    }
+
+    /**
+     * 會員地址的正則表達式
+     */
+    private static final String MEMBER_ADDRESS_PATTERN = "^(?:[\\u4e00-\\u9fa5]+縣|[\\u4e00-\\u9fa5]+市).*";
+
+    /**
+     * 處理會員地址變更請求。
+     * 此方法處理 HTTP POST 請求到 '/frontend/member/changeMemberAddress' URL 路徑，
+     * 接收舊會員地址和新會員地址的請求參數。
+     * 如果輸入的舊會員地址或新會員地址不符合要求，將在模型中添加相應的錯誤消息，
+     * 並返回到變更會員地址的頁面，讓會員重新輸入。
+     * 如果變更成功，將更新會員地址，並在會話中更新會員信息。
+     *
+     * @param oldMemberAddress 舊會員地址。
+     * @param newMemberAddress 新會員地址。
+     * @param modelMap 包含模型屬性的 'ModelMap'。
+     * @param session 用於存儲和訪問會員訊息的會話對象。
+     * @return 如果模型中存在錯誤，返回到變更會員地址頁面；否則重定向到個人資訊頁面。
+     */
+    @PostMapping("/changeMemberAddress")
+    public String changeMemberAddress(@RequestParam("oldMemberAddress") String oldMemberAddress,
+                                      @RequestParam("newMemberAddress") String newMemberAddress,
+                                      ModelMap modelMap,
+                                      HttpSession session) {
+
+        // 從會話中獲取當前登錄的會員訊息
+        Member member = (Member) session.getAttribute("loginsuccess");
+
+        // 檢查舊會員地址是否為空白
+        if (oldMemberAddress.isEmpty()) {
+            modelMap.addAttribute("emptyoldMemberAddress", "舊會員地址不可為空白，請重新輸入!");
+        } else if (!member.getMemAdd().equals(oldMemberAddress)) {
+            // 檢查就會員地址是否輸入正確
+            modelMap.addAttribute("oldMemberAddressError", "會員地址輸入有誤，請重新輸入!");
+        }
+
+        // 檢查會員新地址是否為空白
+        if (newMemberAddress.isEmpty()) {
+            modelMap.addAttribute("emptyNewMemberAddress", "會員新的地址不可為空白，請重新輸入!");
+        } else if (!newMemberAddress.matches(MEMBER_ADDRESS_PATTERN)) {
+            // 檢查會員新地址是否符合正則表達式
+            modelMap.addAttribute("newMemberAddressError", "至少需要填入縣市");
+        }
+
+        // 如果模型存在錯誤，返回變更會員地址頁面
+        if (!modelMap.isEmpty()) {
+            // 將舊會員地址重新添加到模型中
+            modelMap.addAttribute("oldMemberAddress", oldMemberAddress);
+            return "frontend/member/changeMemberAddress";
+        }
+
+        // 將會員的地址設置為新的地址
+        member.setMemAdd(newMemberAddress);
+        memberService.edit(member);
+
+        // 更新會話中的會員訊息
+        session.setAttribute("loginsuccess", member);
+
+        // 重定向到個人資訊頁面
+        return "redirect:/frontend/member/memberData";
     }
 
     /**

@@ -119,6 +119,11 @@
             background-color: #0056b3;
         }
 
+        /*.container .test {*/
+        /*    display: flex;*/
+        /*    justify-content: flex-start;*/
+        /*}*/
+
     </style>
 </head>
 <body>
@@ -153,28 +158,63 @@
             </tr>
             <tr>
                 <td>姓名</td>
-                <td th:text="${myData.memName}"></td>
+                <td style="justify-content: flex-start">
+                    <div class="container" style="display: flex; justify-content: flex-start;">
+                        <div class="test">
+                            <span th:text="${myData.memName}"></span>
+                        </div>
+                        <div class="test" style="margin-left: 15px;">
+                            <form th:action="@{newMemberName}" method="get">
+                                <input type="submit" value="變更會員姓名" class="submit">
+                            </form>
+                        </div>
+                    </div>
+                </td>
             </tr>
             <tr>
                 <td>會員帳號</td>
-                <td th:text="${myData.memAcc}"></td>
+                <td style="justify-content: flex-start">
+                    <div class="container"  style="display: flex; justify-content: flex-start;">
+                        <div class="test">
+                            <span th:text="${myData.memAcc}"></span>
+                        </div>
+                        <div class="test" style="margin-left: 15px;">
+                            <form th:action="@{newMemberAccount}" method="get">
+                                <input type="submit" value="變更會員帳號" class="submit">
+                            </form>
+                        </div>
+                    </div>
+                </td>
             </tr>
-            <tr>
             <tr>
                 <td>會員密碼</td>
-                <td th:text="${myData.memPwd}"></td>
-            </tr>
-            <tr>
-                <td>密碼變更</td>
-                <td>
-                    <form th:action="@{newPassword}" method="get">
-                        <input type="submit" value="變更密碼" class="submit">
-                    </form>
+                <td style="justify-content: flex-start">
+                    <div class="container"  style="display: flex; justify-content: flex-start;">
+                        <div class="test">
+                            <span th:text="${myData.memPwd}"></span>
+                        </div>
+                        <div class="test" style="margin-left: 15px;">
+                            <form th:action="@{newPassword}" method="get">
+                                <input type="submit" value="變更密碼" class="submit">
+                            </form>
+                        </div>
+                    </div>
                 </td>
             </tr>
             <tr>
                 <td>手機號碼</td>
-                <td th:text="${myData.memMob}"></td>
+                <td style="justify-content: flex-start">
+                    <div class="container"  style="display: flex; justify-content: flex-start;">
+                        <div class="test">
+                            <span th:text="${myData.memMob}"></span>
+                        </div>
+                        <div class="test" style="margin-left: 15px;">
+                            <form th:action="@{newMemberMobile}" method="get">
+                                <input type="submit" value="變更會員電話" class="submit">
+                            </form>
+                        </div>
+                    </div>
+                </td>
             </tr>
             <tr>
                 <td>性別</td>
@@ -184,12 +224,34 @@
                 </td>
             </tr>
             <tr>
-                <td>信箱帳號</td>
-                <td th:text="${myData.memMail}"></td>
+                <td>會員信箱</td>
+                <td style="justify-content: flex-start">
+                    <div class="container"  style="display: flex; justify-content: flex-start;">
+                        <div class="test">
+                            <span th:text="${myData.memMail}"></span>
+                        </div>
+                        <div class="test" style="margin-left: 15px;">
+                            <form th:action="@{newMemberMail}" method="get">
+                                <input type="submit" value="變更會員信箱" class="submit">
+                            </form>
+                        </div>
+                    </div>
+                </td>
             </tr>
             <tr>
                 <td>聯絡地址</td>
-                <td th:text="${myData.memAdd}"></td>
+                <td style="justify-content: flex-start">
+                    <div class="container"  style="display: flex; justify-content: flex-start;">
+                        <div class="test">
+                            <span th:text="${myData.memAdd}"></span>
+                        </div>
+                        <div class="test" style="margin-left: 15px;">
+                            <form th:action="@{newMemberAddress}" method="get">
+                                <input type="submit" value="變更會員地址" class="submit">
+                            </form>
+                        </div>
+                    </div>
+                </td>
             </tr>
             <tr>
                 <td>會員生日</td>
@@ -204,11 +266,30 @@
                 <!-- 					<span th:if="${myData.memStatus ==2}" th:text="停權"></span>				 -->
                 <!-- 				</td> -->
             </tr>
+            <tr th:if="${myData.memStat == 0}">
+                <td>驗證狀態</td>
+                <td style="justify-content: flex-start">
+                    <div class="container" style="display: flex; justify-content: flex-start; ">
+                        <div class="test">
+                            <span>未驗證</span>
+                        </div>
+                        <div class="test" style="margin-left: 15px;">
+                            <form th:action="@{varifyMailByOneMember}" method="get">
+                                <input type="submit" value="重新發送驗證郵件" class="submit">
+                            </form>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            <tr th:if="${myData.memStat == 1}">
+                <td>驗證狀態</td>
+                <td  th:text="已驗證"></td>
+            <tr>
 <!--            <tr>-->
 <!--                <td>最後上線時間</td>-->
 <!--                <td th:if="${myData.lastLoginTime != null}" th:text="${#dates.format(myData.lastLoginTime, 'yyyy/MM/dd HH:mm:ss')}"></td>-->
 <!--            </tr>-->
-            <tr>
+
                 <td>修改會員資料</td>
                 <td >
                     <form method="get" th:action="@{updateData}">

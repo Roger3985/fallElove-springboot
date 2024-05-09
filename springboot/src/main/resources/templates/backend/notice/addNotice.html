@@ -2,237 +2,156 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
-    <link th:href="@{/css/backend/index/styles.css}" rel="stylesheet" />
-    <link th:href="@{/css/backend/index/index.css}" rel="stylesheet" />
-
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            box-sizing: border-box;
-        }
-
-        main {
-            margin-top: 30px;
-            padding: 50px 20px;
-            text-align: center; /* 新增這一行，使內容置中 */
-        }
-
-        form {
-            display: inline-block;
-            max-width: 600px;
-            margin: 0 auto;
-            background: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            margin-top: 50px;
-        }
-
-        table {
-            width: 100%;
-            margin-bottom: 20px;
-            border-collapse: collapse;
-            border-spacing: 0;
-        }
-
-        th, td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-        }
-
-        th {
-            background-color: #f2f2f2;
-        }
-
-        label {
-            font-weight: bold;
-            display: block;
-            margin-bottom: 8px;
-        }
-
-        input {
-            width: calc(100% - 12px);
-            padding: 10px;
-            margin-bottom: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
-        }
-
-        .error {
-            color: red;
-        }
-
-        .submit {
-            background-color: #007bff;
-            color: #fff;
-            padding: 10px 15px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        .submit:hover {
-            background-color: #0056b3;
-        }
-
-        .content {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-
-        .text {
-            font-size: 2em;
-            margin-bottom: 20px;
-        }
-
-        .field {
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            margin-bottom: 15px;
-        }
-
-        .fas {
-            position: absolute;
-            left: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-        }
-
-        .forgot-pass {
-            text-align: right;
-            margin-bottom: 10px;
-        }
-
-        button {
-            padding: 10px;
-            background-color: #007bff;
-            color: #fff;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        .sign-up {
-            margin-top: 15px;
-            text-align: center;
-        }
-
-        a {
-            color: #007bff;
-        }
-
-        a:hover {
-            text-decoration: underline;
-        }
-
-        #effect h3 {
-            margin: 0;
-            padding: 0.4em;
-            text-align: center;
-            background-color: red;
-        }
-    </style>
-
-    <title>最新消息公告</title>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新增會員通知資料</title>
+    <th:block th:include="~{backend/component/plugin/backendplugin.html :: css}"></th:block>
+    <!-- Custom styles for this page -->
+    <link th:href="@{/backend/vendor/datatables/dataTables.bootstrap4.min.css}" rel="stylesheet"/>
 </head>
-<body>
-    <main> <!-- 修改這裡，將內容置中 -->
-        <h1>最新消息公告</h1>
-        <form method="post" th:action="@{addNotice}" th:object="${notice}" enctype="multipart/form-data">
-            <table>
-                <tr>
-                    <td><label for="motNo">會員通知編號:</label></td>
-                    <td><input type="number" id="motNo" title="請輸入會員通知編號" th:field="*{motNo}"></td>
-                    <td><label class="error" th:if="${#fields.hasErrors('motNo')}" th:errors="*{motNo}"></label></td>
-                </tr>
+<body id="page-top">
+<main>
+    <!-- Page Wrapper -->
+    <div id="wrapper">
+        <!-- Sidebar -->
+        <ul th:replace="backend/component/sidebar :: sidebar"></ul>
+        <!-- End of Sidebar -->
+        <!-- Content Wrapper -->
+        <div id="content-wrapper" class="d-flex flex-column">
+            <!-- Main Content -->
+            <div id="content">
+                <!-- Topbar -->
+                <nav th:replace="backend/component/nav :: nav"></nav>
+                <!-- End of Topbar -->
+                <!-- Begin Page Content -->
+                <div class="container-fluid">
+                    <div th:replace="backend/component/breadcrumb :: breadcrumb"></div>
+                    <!-- 內容請填這裡~~~~~~~~~~~~~~~ -->
+                    <!-- DataTales Example -->
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold text-primary">新增會員通知資料:</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <form method="post" th:action="@{addNotice}" th:object="${notice}">
+                                    <table>
+                            <!--            <tr>-->
+                            <!--                <td><label for="memNo">會員編號:</label></td>-->
+                            <!--                <option th:each="memNo : ${noticeListData}" th:field="*{}"></option>-->
+                            <!--                <td><label class="error" th:if="${#fields.hasErrors('member.memNo')}" th:errors="*{member.memNo}"></label></td>-->
+                            <!--            </tr>-->
+                                        <tr>
+                                            <td><label for="member.memNo">會員編號:</label></td>
+                                            <td>
+                                                <select type="number" id="member.memNo" name="member.memNo" title="請輸入會員編號" th:field="*{member.memNo}">
+                                                    <option th:each="member : ${memberListData}" th:value="${member.memNo}" th:text="${member.memNo}"></option>
+                                                </select>
+                                            </td>
+                                            <td><label class="error" th:if="${#fields.hasErrors('member.memNo')}" th:errors="*{member.memNo}"></label></td>
+                                        </tr>
 
-                <tr>
-                    <td><label for="member.memNo">會員編號:</label></td>
-                    <td><input type="number" id="member.memNo" title="請輸入會員編號:" th:field="*{member.memNo}"></td>
-                    <td><label class="error" th:if="${#fields.hasErrors('member.memNo')}" th:errors="*{member.memNo}"></label></td>
-                </tr>
+                                        <tr>
+                                            <td><label for="notContent">通知內容:</label></td>
+                                            <td><input type="text" id="notContent" title="請輸入通知內容" th:field="*{notContent}"></td>
+                                            <td><label class="error" th:if="${#fields.hasErrors('notContent')}" th:errors="*{notContent}"></label></td>
+                                        </tr>
 
-                <tr>
-                    <td><label for="notContent">通知內容:</label></td>
-                    <td><input type="text" id="notContent" title="請輸入通知內容:" th:field="*{notContent}"></td>
-                    <td><label class="error" th:if="${#fields.hasErrors('notContent')}" th:errors="*{notContent}"></label></td>
-                </tr>
+                            <!--            <tr>-->
+                            <!--                <td><label for="notContent2">快速選擇會員通知內容:</label></td>-->
+                            <!--                <td>-->
+                            <!--                    <select type="text" id="notContent2" title="請輸入通知內容" th:field="*{notContent}">-->
+                            <!--                        <option value="您的訂單已成功支付">您的訂單已成功支付</option>-->
+                            <!--                        <option value="你的優惠卷已發放">您的優惠卷已發放</option>-->
+                            <!--                        <option value="您的訂單已發貨，預計三個工作日內送達">您的訂單已發貨，預計三個工作日內送達</option>-->
+                            <!--                        <option value="您的密碼已成功重置，請妥善保管新密碼">您的密碼已成功重置，請妥善保管新密碼</option>-->
+                            <!--                        <option value="您的會員註冊已成功，歡迎加入我們的大家庭">您的會員註冊已成功，歡迎加入我們的大家庭</option>-->
+                            <!--                    </select>-->
+                            <!--                </td>-->
+                            <!--                <td><label class="error" th:if="${#fields.hasErrors('notContent')}" th:errors="*{notContent}"></label></td>-->
+                            <!--            </tr>-->
 
-                <tr>
-                    <td><label for="notTime">發送時間：</label></td>
-                    <td><input type="datetime-local" id="notTime" th:field="*{notTime}"></td>
-                    <td><label class="error" th:if="${#fields.hasErrors('notTime')}" th:errors="*{notTime}"></label></td>
-                </tr>
+                                        <tr>
+                                            <td><input type="hidden" id="notTime" name="notTime" th:field="*{notTime}"></td>
+                                            <td><label class="error" th:if="${#fields.hasErrors('notTime')}" th:errors="*{notTime}"></label></td>
+                                        </tr>
 
-                <tr>
-                    <td><label for="notStat">讀取狀態:</label></td>
-                    <td>
-                        <select id="notStat" title="讀取狀態" th:field="*{notStat}">
-                            <option value="0">未讀</option>
-                            <option value="1">已讀</option>
-                        </select>
-                    </td>
-                    <td>
-                        <label class="error" th:if="${#fields.hasErrors('notStat')}" th:errors="*{notStat}" id="errors"></label>
-                    </td>
-                </tr>
+                                        <tr>
+                                            <td><label for="notStat">讀取狀態：</label></td>
+                                            <td>
+                                                <input type="hidden" id="notStat" name="notStat" th:field="*{notStat}">
+                                                <span>未讀</span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2" style="text-align: center;">
+                                                <input type="submit" value="送出新增">
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- /.container-fluid -->
+            </div>
+            <!-- End of Main Content -->
 
-                <tr>
-                    <td><input type="submit" id="submit" value="送出新增"></td>
-                </tr>
+            <!-- Footer -->
+            <footer th:replace="backend/component/bottom :: bottom"></footer>
+            <!-- End of Footer -->
+        </div>
+        <!-- End of Content Wrapper -->
+    </div>
+    <!-- End of Page Wrapper -->
 
-            </table>
-        </form>
-<!--        <script>-->
-<!--            // 根據所需格式格式化日期和時間的函數-->
-<!--            function formatDateTime(dateTimeString) {-->
-<!--                const date = new Date(dateTimeString);-->
+    <!-- Scroll to Top Button-->
+    <a th:replace="backend/component/scrolltotop :: scrolltotop"></a>
+    <!-- Logout Modal-->
+    <div th:replace="backend/component/logout :: logout"></div>
 
-<!--                // 提取日期和時間的各個部分-->
-<!--                const year = date.getFullYear();-->
-<!--                const month = String(date.getMonth() + 1).padStart(2, '0');-->
-<!--                const day = String(date.getDate()).padStart(2, '0');-->
-<!--                const hours = String(date.getHours()).padStart(2, '0');-->
-<!--                const minutes = String(date.getMinutes()).padStart(2, '0');-->
-<!--                const seconds = String(date.getSeconds()).padStart(2, '0');-->
+    <th:block th:insert="~{backend/component/plugin/backendplugin.html :: js}"></th:block>
+    <!-- Page level plugins -->
+    <script th:src="@{/backend/vendor/datatables/jquery.dataTables.min.js}"></script>
+    <script th:src="@{/backend/vendor/datatables/dataTables.bootstrap4.min.js}"></script>
+    <!-- Page level custom scripts -->
+    <script th:src="@{/backend/js/demo/datatables-demo.js}"></script>
+    <!-- JavaScript -->
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+    <script>
+        $(document).ready(function() {
+            // 在表單提交時更新 notTime 字段為當前時間
+            $('form').submit(function(event) {
+                // 獲取 notTime 輸入元素
+                var notTimeInput = $('#notTime');
 
-<!--                // 組合為 "yyyy-MM-ddThh:mm:ss" 格式-->
-<!--                return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;-->
-<!--            }-->
+                // 獲取當前時間
+                var now = new Date();
+                var year = now.getFullYear();
+                var month = String(now.getMonth() + 1).padStart(2, '0');
+                var day = String(now.getDate()).padStart(2, '0');
+                var hours = String(now.getHours()).padStart(2, '0');
+                var minutes = String(now.getMinutes()).padStart(2, '0');
+                var seconds = String(now.getSeconds()).padStart(2, '0');
 
-<!--            // 附加表單提交事件的事件監聽器-->
-<!--            document.querySelector('form').addEventListener('submit', function (event) {-->
-<!--                // 阻止表單立即提交-->
-<!--                event.preventDefault();-->
+                // 組合日期時間為 SQL Timestamp 格式
+                var dateTimeString = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 
-<!--                // 獲取 notTime 輸入字段-->
-<!--                const notTimeInput = document.getElementById('notTime');-->
+                // 將日期時間設置為 notTime 輸入值
+                notTimeInput.val(dateTimeString);
+            });
+        });
 
-<!--                // 在 notTime 輸入字段中格式化日期和時間值-->
-<!--                const formattedDateTime = formatDateTime(notTimeInput.value);-->
+        // 在 DOM 加載完成時設置 notStat 輸入框的值為 0
+        document.addEventListener('DOMContentLoaded', function() {
+            // 選擇 ID 為 "notStat" 的 input 元素
+            var notStatInput = document.getElementById('notStat');
 
-<!--                // 使用格式化的值更新 notTime 輸入字段-->
-<!--                notTimeInput.value = formattedDateTime;-->
-
-<!--                // 使用正確的表單對象提交表單-->
-<!--                event.target.submit();-->
-<!--            });-->
-<!--        </script>-->
-
-        <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-        <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
-<!--        <div th:replace="backend/HTMLTool/nav :: nav"></div>-->
-
-
-    </main>
+            // 設置值為 0
+            notStatInput.value = '0';
+        });
+    </script>
+</main>
 </body>
 </html>

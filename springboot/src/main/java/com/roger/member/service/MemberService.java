@@ -1,7 +1,6 @@
 package com.roger.member.service;
 
 import com.roger.member.entity.Member;
-import org.springframework.data.domain.Page;
 
 import java.util.List;
 
@@ -16,13 +15,22 @@ public interface MemberService {
     public Member register(Member member);
 
     /**
-     * 登入會員並驗證其帳號和密碼。
+     * 登入會員並驗證其信箱和密碼。
      *
      * @param memMail 會員的註冊信箱。
      * @param memPwd 會員的註冊密碼。
-     * @return 登入成功後的 MemberVO 物件，其中包含該會員的資料。
+     * @return 登入成功後的 Member 物件，其中包含該會員的資料。
      */
     public Member login(String memMail, String memPwd);
+
+    /**
+     * 登入會員並驗證其帳號和密碼。
+     *
+     * @param memAcc 會員的註冊帳號。
+     * @param memPwd 會員的註冊密碼。
+     * @return 登入成功後的 Member 物件，其中包含該會員的資料。
+     */
+    public Member loginByMemAcc(String memAcc, String memPwd);
 
     /**
      * 編輯會員資料
@@ -51,6 +59,22 @@ public interface MemberService {
      * @return 找到相對應的會員，則返回 MemberVO 物件。
      */
     public Member findByNo(Integer memNo);
+
+    /**
+     * 根據電子郵件查找會員。
+     *
+     * @param memMail 要查找的會員的電子郵件。
+     * @return 與該電子郵件相匹配的會員，如果找不到則返回 null。
+     */
+    public Member findByMail(String memMail);
+
+    /**
+     * 根據會員帳號查找會員。
+     *
+     * @param memAcc 要查找的會員的帳號。
+     * @return 與該帳號相匹配的會員，如果找不到則返回 null。
+     */
+    public Member findByMemAcc(String memAcc);
 
     /**
      * 查找所有會員。
@@ -100,6 +124,12 @@ public interface MemberService {
     public void banMem(Integer memNo);
 
     /**
+     * 禁用指定會員並更新其狀態。
+     * @param member 要禁用的會員。
+     */
+    public void banMember(Member member);
+
+    /**
      * 檢查會員帳號是否在系統中存在。
      * 此方法接受會員帳號的標識，並返回該會員帳號是否存在。
      *
@@ -136,4 +166,5 @@ public interface MemberService {
      * @return 與給定會員編號匹配的會員對象；如果找不到匹配的會員，則返回 null。
      */
     public Member getMemberByMemNo(Integer memNo);
+
 }

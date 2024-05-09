@@ -66,6 +66,7 @@
                     <td>資料</td>
                 </tr>
             </table>
+            <input type="hidden" th:field="*{memNo}">
             <div class="input-box">
                 <label>姓名：<b>*</b></label>
                 <input type="text" placeholder="請輸入姓名" th:field="*{memName}" />
@@ -76,12 +77,13 @@
                 <label>會員帳號：<b>*</b></label>
                 <input type="text" placeholder="請輸入會員帳號" th:field="*{memAcc}" />
                 <span  th:if="${#fields.hasErrors('memAcc')}" th:errors="*{memAcc}" class="error" id="ename.errors"></span>
+                <span th:text="${duplicateAccount}" class="error" id="duplicateAccount.error"></span>
             </div>
 
             <div class="input-box">
                 <label>會員密碼：<b>*</b></label>
                 <input type="password" placeholder="請輸入會員密碼" th:field="*{memPwd}"/>
-                <span  th:if="${#fields.hasErrors('memPwd')}" th:errors="*{memPwd}" class="error" id="ename.errors"></span>
+                <span  th:if="${#fields.hasErrors('memPwd')}" th:errors="*{memPwd}" class="error" id="memPwd.errors"></span>
             </div>
 
             <div class="column">
@@ -89,6 +91,7 @@
                     <label>手機號碼：<b>*</b></label>
                     <input type="text" placeholder="例：0912345678" th:field= "*{memMob}" />
                     <span th:if="${#fields.hasErrors('memMob')}" th:errors="*{memMob}" class="error"></span>
+                    <span th:text="${duplicateMobile}" class="error" id="duplicateMobile.error"></span>
                 </div>
             </div>
             <div class="gender-box">
@@ -112,6 +115,7 @@
                     <input type="text" placeholder="會員信箱" th:field="*{memMail}" />
                 </div>
                 <span th:if="${#fields.hasErrors('memMail')}" th:errors="*{memMail}" class="error" id="email.errors"></span>
+                <span th:text="${duplicateMail}" class="error" id="duplicateMail.error"></span>
             </div>
 
             <div class="input-box address">
@@ -144,17 +148,26 @@
                 <span th:if="${#fields.hasErrors('memCard')}" th:errors="*{memCard}" class="error"></span>
             </div>
             <br>
+            <div class="input-box">
+                <label>驗證狀態:</label>
+                <b>
+                    <span th:text="${data.memStat == 0 ? '未驗證' : data.memStat == 1 ? '已驗證' : '未驗證'}"></span>
+                </b>
+                <input type="hidden" th:field="*{memStat}" name="memStat">
+                <span th:if="${#fields.hasErrors('memStat')}" th:errors="${data.memStat}" class="error"></span>
+            </div>
+            <br>
 
             <input type="file" th:field= "*{memPic}" id="the_file">
-            <input type="hidden" th:field="*{memNo}">
-            <input type="hidden" th:field="*{memName}">
-            <input type="hidden" th:field="*{memAcc}">
-            <input type="hidden" th:field="*{memPwd}">
-            <input type="hidden" th:field="*{memMob}">
-            <input type="hidden" th:field="*{memGender}">
-            <input type="hidden" th:field="*{memMail}">
-            <input type="hidden" th:field="*{memAdd}">
-            <input type="hidden" th:field="*{memBd}">
+            <input type="hidden" th:field="*{memberJoinTime}">
+
+            <!--            <input type="hidden" th:field="*{memName}">-->
+            <!--            <input type="hidden" th:field="*{memAcc}">-->
+            <!--            <input type="hidden" th:field="*{memPwd}">-->
+            <!--            <input type="hidden" th:field="*{memMob}">-->
+            <!--            <input type="hidden" th:field="*{memGender}">-->
+            <!--            <input type="hidden" th:field="*{memMail}">-->
+            <!--            <input type="hidden" th:field="*{memAdd}">-->
 
             <input type="submit" class="submit" value="修改資料">
 

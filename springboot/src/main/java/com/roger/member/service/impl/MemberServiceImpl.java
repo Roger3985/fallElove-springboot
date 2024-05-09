@@ -4,16 +4,13 @@ import com.roger.member.repository.MemberRepository;
 import com.roger.member.entity.Member;
 import com.roger.member.service.MemberService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.sql.Date;
 import java.sql.Timestamp;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
@@ -70,7 +67,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     /**
-     * 登入會員
+     * 登入會員並驗證其信箱和密碼。
      */
     @Override
     public Member login(String memMail, String memPwd) {
@@ -87,6 +84,26 @@ public class MemberServiceImpl implements MemberService {
 
         // 返回會員資料(如果密碼匹配則返回會員資料；否則返回null)
         return getMemMail;
+    }
+
+    /**
+     * 登入會員並驗證其帳號和密碼。
+     */
+    @Override
+    public Member loginByMemAcc(String memAcc, String memPwd) {
+        // 根據會員的帳號尋找會員資料
+        Member getMemAcc = memberRepository.findByMemAcc(memAcc);
+
+        // 如果找不到會員資料，則返回該會員資料，即 null
+        if (getMemAcc == null) {
+            return getMemAcc;
+        }
+
+        // 核對密碼(比較輸入的密碼經哈希後的結果與會員資料中的密碼是否匹配)
+        getMemAcc = (hashPassword(memPwd).equals(getMemAcc.getMemPwd())) ? getMemAcc : null;
+
+        // 返回會員資料(如果密碼匹配則返回會員資料；否則返回null)
+        return getMemAcc;
     }
 
     /**
@@ -111,6 +128,22 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public Member findByNo(Integer memNo) {
         return memberRepository.findById(memNo).orElse(null);
+    }
+
+    /**
+     * 根據電子郵件查找會員。
+     */
+    @Override
+    public Member findByMail(String memMail) {
+        return memberRepository.findByMemMail(memMail);
+    }
+
+    /**
+     * 根據會員帳號查找會員。
+     */
+    @Override
+    public Member findByMemAcc(String memAcc) {
+        return memberRepository.findByMemAcc(memAcc);
     }
 
     /**
@@ -246,6 +279,18 @@ public class MemberServiceImpl implements MemberService {
         Member data = memberRepository.findById(memNo).orElse(null);
         memberRepository.updateMemStatById(memNo, Byte.valueOf("2"));
     }
+
+    /**
+     * 禁用指定會員並更新其狀態。
+     */
+    @Override
+    public void banMember(Member member) {
+        // 設置會員狀態為 2，表示被禁用
+        member.setMemStat((byte) 2);
+        // 保存修改後的會員信息
+        memberRepository.save(member);
+    }
+
 
     /**
      * 檢查會員帳號是否在系統中存在。

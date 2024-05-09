@@ -16,6 +16,8 @@ public interface NoticeService {
      */
     public Notice addNotice(Notice notice);
 
+    public boolean deleteNotice(String )
+
     /**
      * 更新現有的通知。
      * 該方法根據傳入的 Notice 物件更新現有的通知。在更新過程中，該方法將更改現有通知的屬性以匹配傳入的 notice。

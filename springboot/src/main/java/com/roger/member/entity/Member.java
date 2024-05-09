@@ -40,22 +40,23 @@ public class Member implements java.io.Serializable {
     private Integer memNo;
 
     @NotBlank(message = "會員姓名: 請勿空白")
-    @ValidMemName(groups = Create.class)
+    @ValidMemName(groups = {Create.class, CreateWithout.class})
     @Column(name = "memname")
     private String memName;
 
     @NotBlank(message = "會員帳號: 請勿空白")
-    @ValidMemAccount(groups = Create.class)
+    @ValidMemAccount(groups = {Create.class, CreateWithout.class})
     @UniqueMemberAccount(groups = Create.class)
     @Column(name = "memacc", unique = true) //`uniqueAnnotation` 屬性設置為 `true`，表示該列應該具有唯一性約束。這意味著數據庫中的每一個 `memAcc` 值都必須是唯一的，不能有重複的值。
     private String memAcc;
 
     @NotBlank(message = "會員密碼: 請勿空白")
+    @ValidMemPassword(groups = {Create.class, CreateWithout.class})
     @Column(name = "mempwd")
     private String memPwd;
 
     @NotBlank(message = "會員手機: 請勿空白")
-    @ValidMemMobile(groups = Create.class)
+    @ValidMemMobile(groups = {Create.class, CreateWithout.class})
     @UniqueMemberMobile(groups = Create.class)
     @Column(name = "memmob", columnDefinition = "CHAR(10)", unique = true)
     private String memMob;
@@ -65,13 +66,13 @@ public class Member implements java.io.Serializable {
     private Byte memGender;
 
     @NotBlank(message = "會員信箱: 請勿空白!")
-    @ValidMemMail(groups = Create.class)
+    @ValidMemMail(groups = {Create.class, CreateWithout.class})
     @UniqueMemberMail(groups = Create.class)
-    @Email
+//    @Email
     @Column(name = "memmail", unique = true)
     private String memMail;
 
-//    @NotBlank(message = "會員地址: 請勿空白")
+    @NotBlank(message = "會員詳細地址: 請勿空白")
     @Column(name = "memadd")
     private String memAdd;
 
@@ -81,7 +82,7 @@ public class Member implements java.io.Serializable {
     private java.sql.Date memBd;
 
 //    @NotBlank(message = "會員信用卡: 請勿空白")
-    @ValidCreditCard(groups = Create.class)
+    @ValidCreditCard(groups = {Create.class, CreateWithout.class})
     @Column(name = "memcard")
     private String memCard;
 
@@ -112,6 +113,7 @@ public class Member implements java.io.Serializable {
     private Timestamp memberJoinTime;
 
     @Column(name = "memstat")
+//    @NotBlank(message = "請輸入驗證狀態")
     private Byte memStat;
 
     @Column(name = "memsalt")
@@ -216,6 +218,7 @@ public class Member implements java.io.Serializable {
         this.memSalt = memSalt;
         this.memPic = memPic;
     }
+
 
     public Integer getMemNo() {
         return memNo;

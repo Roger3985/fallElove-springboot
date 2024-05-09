@@ -189,13 +189,13 @@
                     </select>
                 </div>
             </div>
-            <input type="text" placeholder="請輸入詳細地址" th:field= "*{memAdd}"/>
+            <input type="text" placeholder="請輸入詳細地址" th:field= "*{memAdd}" />
             <span th:if="${#fields.hasErrors('memAdd')}" th:errors="*{memAdd}" class="error"></span>
         </div>
 
         <div class="input-box">
             <label>生日:<b>*</b></label>
-            <input type="date" placeholder="請輸入生日" th:field="*{memBd}" />
+            <input type="date" placeholder="請輸入生日" th:field="*{memBd}" required />
             <span th:if="${#fields.hasErrors('memBd')}" th:errors="*{memBd}" class="error"></span>
         </div>
 
@@ -211,8 +211,13 @@
             <span th:if="${#fields.hasErrors('memCard')}" th:errors="*{memCard}" class="error"></span>
         </div>
         <br>
+        <div>
+            <label>選擇會員大頭貼(非必要):<b></b></label>
+            <input type="file" name="memPic" th:field="*{memPic}" style="dispaly: none;">
+        </div>
+        <br>
         <div class="input-box2">
-            <label>選擇要註冊的第三方平台：<b>*</b></label>
+            <label>選擇要註冊的第三方平台：<b></b></label>
             <div id="platform-buttons">
                 <button1 type="button" data-value="github" class="platform-button">
                     <img src="/images/frontend/github.png" alt="GitHub" width="50" height="50" />
@@ -230,9 +235,6 @@
             <input type="hidden" th:field="*{provider}" id="provider-hidden" />
             <span th:if="${#fields.hasErrors('provider')}" th:errors="*{provider}" class="error"></span>
         </div>
-
-
-        <input type="file" name="memPic" th:field="*{memPic}" style="dispaly: none;">
         <button>註冊</button>
     </form>
     <a th:href="@{login}"><button class="goBack">返回登入</button></a>
